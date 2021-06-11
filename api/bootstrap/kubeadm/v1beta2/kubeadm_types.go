@@ -145,6 +145,20 @@ func (r *InitConfiguration) IsDefined() bool {
 // ClusterConfiguration contains cluster-wide configuration for a kubeadm cluster.
 // +kubebuilder:validation:MinProperties=1
 type ClusterConfiguration struct {
+	// Pause holds the image source for pause container
+	// This is only for bottlerocket
+	// +optional
+	Pause Pause `json:"pause,omitempty"`
+
+	// BottlerocketBootstrap holds the image source for kubeadm bootstrap container
+	// This is only for bottlerocket
+	// +optional
+	BottlerocketBootstrap BottlerocketBootstrap `json:"bottlerocketBootstrap,omitempty"`
+
+	// Proxy holds the https and no proxy information
+	// This is only for bottlerocket
+	// +optional
+	Proxy ProxyConfiguration `json:"proxy,omitempty"`
 	// etcd holds configuration for etcd.
 	// NB: This value defaults to a Local (stacked) etcd
 	// +optional
@@ -226,6 +240,55 @@ type ClusterConfiguration struct {
 	// This field is only supported with Kubernetes v1.31 or above.
 	// +optional
 	EncryptionAlgorithm EncryptionAlgorithmType `json:"encryptionAlgorithm,omitempty"`
+}
+
+// Pause defines the pause image repo and tag that should be run on the bootstrapped nodes.
+// This setting is ONLY for bottlerocket nodes, as this needs to be set pre-boot time along with user-data
+type Pause struct {
+	// imageRepository sets the container registry to pull images from.
+	// if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=512
+	ImageRepository string `json:"imageRepository,omitempty"`
+
+	// imageTag allows to specify a tag for the image.
+	// In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	ImageTag string `json:"imageTag,omitempty"`
+
+	// TODO: evaluate if we need also a ImageName based on user feedbacks
+}
+
+// BottlerocketBootstrap holds the settings of kubeadm bootstrap container for bottlerocket nodes
+// This setting is ONLY for bottlerocket nodes.
+type BottlerocketBootstrap struct {
+	// imageRepository sets the container registry to pull images from.
+	// if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=512
+	ImageRepository string `json:"imageRepository,omitempty"`
+
+	// imageTag allows to specify a tag for the image.
+	// In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	ImageTag string `json:"imageTag,omitempty"`
+
+	// TODO: evaluate if we need also a ImageName based on user feedbacks
+}
+
+// ProxyConfiguration holds the settings for proxying bottlerocket services
+type ProxyConfiguration struct {
+	// HTTPS proxy
+	HTTPSProxy string `json:"httpsProxy,omitempty"`
+
+	// No proxy, list of ips that should not use proxy
+	NoProxy []string `json:"noProxy,omitempty"`
 }
 
 // IsDefined returns true if the ClusterConfiguration is defined.
@@ -615,6 +678,20 @@ func (r *ExternalEtcd) IsDefined() bool {
 // JoinConfiguration contains elements describing a particular node.
 // +kubebuilder:validation:MinProperties=1
 type JoinConfiguration struct {
+	// Pause holds the image source for pause container
+	// This is only for bottlerocket
+	// +optional
+	Pause Pause `json:"pause,omitempty"`
+
+	// BottlerocketBootstrap holds the image source for kubeadm bootstrap container
+	// This is only for bottlerocket
+	// +optional
+	BottlerocketBootstrap BottlerocketBootstrap `json:"bottlerocketBootstrap,omitempty"`
+
+	// Proxy holds the https and no proxy information
+	// This is only for bottlerocket
+	// +optional
+	Proxy ProxyConfiguration `json:"proxy,omitempty"`
 	// nodeRegistration holds fields that relate to registering the new control-plane node to the cluster.
 	// When used in the context of control plane nodes, NodeRegistration should remain consistent
 	// across both InitConfiguration and JoinConfiguration

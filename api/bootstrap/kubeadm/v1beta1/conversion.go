@@ -652,6 +652,30 @@ func Convert_v1beta2_DNS_To_v1beta1_DNS(in *bootstrapv1.DNS, out *DNS, _ apimach
 	return nil
 }
 
+func Convert_v1beta1_Pause_To_v1beta2_Pause(in *Pause, out *bootstrapv1.Pause, _ apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
+func Convert_v1beta2_Pause_To_v1beta1_Pause(in *bootstrapv1.Pause, out *Pause, _ apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
+func Convert_v1beta1_BottlerocketBootstrap_To_v1beta2_BottlerocketBootstrap(in *BottlerocketBootstrap, out *bootstrapv1.BottlerocketBootstrap, _ apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
+func Convert_v1beta2_BottlerocketBootstrap_To_v1beta1_BottlerocketBootstrap(in *bootstrapv1.BottlerocketBootstrap, out *BottlerocketBootstrap, _ apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
 func Convert_v1beta1_Etcd_To_v1beta2_Etcd(in *Etcd, out *bootstrapv1.Etcd, s apimachineryconversion.Scope) error {
 	if in.Local != nil {
 		if err := Convert_v1beta1_LocalEtcd_To_v1beta2_LocalEtcd(in.Local, &out.Local, s); err != nil {

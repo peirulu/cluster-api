@@ -57,8 +57,8 @@ type BaseUserData struct {
 }
 
 func (input *BaseUserData) prepare() {
-	input.Header = cloudConfigHeader
 	input.WriteFiles = append(input.WriteFiles, input.AdditionalFiles...)
+	input.Header = cloudConfigHeader
 	input.KubeadmCommand = fmt.Sprintf(standardJoinCommand, input.KubeadmVerbosity)
 	input.SentinelFileCommand = sentinelFileCommand
 }

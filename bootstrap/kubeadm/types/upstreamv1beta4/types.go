@@ -28,6 +28,21 @@ import (
 type InitConfiguration struct {
 	metav1.TypeMeta `json:",inline"`
 
+	// Pause holds the image source for pause container
+	// This is only for bottlerocket
+	// +optional
+	Pause Pause `json:"pause,omitempty"`
+
+	// BottlerocketBootstrap holds the image source for kubeadm bootstrap container
+	// This is only for bottlerocket
+	// +optional
+	BottlerocketBootstrap BottlerocketBootstrap `json:"bottlerocketBootstrap,omitempty"`
+
+	// Proxy holds the https and no proxy information
+	// This is only for bottlerocket
+	// +optional
+	Proxy Proxy `json:"proxy,omitempty"`
+
 	// `kubeadm init`-only information. These fields are solely used the first time `kubeadm init` runs.
 	// After that, the information in the fields IS NOT uploaded to the `kubeadm-config` ConfigMap
 	// that is used by `kubeadm upgrade` for instance. These fields must be omitempty.
@@ -81,6 +96,15 @@ type InitConfiguration struct {
 // ClusterConfiguration contains cluster-wide configuration for a kubeadm cluster.
 type ClusterConfiguration struct {
 	metav1.TypeMeta `json:",inline"`
+	// Pause holds the image source for pause container
+	// This is only for bottlerocket
+	// +optional
+	Pause Pause `json:"pause,omitempty"`
+
+	// BottlerocketBootstrap holds the image source for kubeadm bootstrap container
+	// This is only for bottlerocket
+	// +optional
+	BottlerocketBootstrap BottlerocketBootstrap `json:"bottlerocketBootstrap,omitempty"`
 
 	// Etcd holds configuration for etcd.
 	// +optional
@@ -162,6 +186,46 @@ type ClusterConfiguration struct {
 	CACertificateValidityPeriod *metav1.Duration `json:"caCertificateValidityPeriod,omitempty"`
 }
 
+// Pause defines the pause image repo and tag that should be run on the bootstrapped nodes.
+// This setting is ONLY for bottlerocket nodes, as this needs to be set pre-boot time along with user-data
+type Pause struct {
+	// imageRepository sets the container registry to pull images from.
+	// if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=512
+	ImageRepository string `json:"imageRepository,omitempty"`
+
+	// imageTag allows to specify a tag for the image.
+	// In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	ImageTag string `json:"imageTag,omitempty"`
+
+	// TODO: evaluate if we need also a ImageName based on user feedbacks
+}
+
+// BottlerocketBootstrap holds the settings of kubeadm bootstrap container for bottlerocket nodes
+// This setting is ONLY for bottlerocket nodes.
+type BottlerocketBootstrap struct {
+	// imageRepository sets the container registry to pull images from.
+	// if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=512
+	ImageRepository string `json:"imageRepository,omitempty"`
+
+	// imageTag allows to specify a tag for the image.
+	// In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	ImageTag string `json:"imageTag,omitempty"`
+
+	// TODO: evaluate if we need also a ImageName based on user feedbacks
+}
+
 // ControlPlaneComponent holds settings common to control plane component of the cluster.
 type ControlPlaneComponent struct {
 	// ExtraArgs is an extra set of flags to pass to the control plane component.
@@ -205,6 +269,12 @@ type Proxy struct {
 	// Disabled specifies whether to disable this addon in the cluster
 	// +optional
 	Disabled bool `json:"disabled,omitempty"`
+
+	// HTTPS proxy
+	HTTPSProxy string `json:"httpsProxy,omitempty"`
+
+	// No proxy, list of ips that should not use proxy
+	NoProxy []string `json:"noProxy,omitempty"`
 }
 
 // ImageMeta allows to customize the image used for components that are not
@@ -387,6 +457,21 @@ type ExternalEtcd struct {
 // JoinConfiguration contains elements describing a particular node.
 type JoinConfiguration struct {
 	metav1.TypeMeta `json:",inline"`
+
+	// Pause holds the image source for pause container
+	// This is only for bottlerocket
+	// +optional
+	Pause Pause `json:"pause,omitempty"`
+
+	// BottlerocketBootstrap holds the image source for kubeadm bootstrap container
+	// This is only for bottlerocket
+	// +optional
+	BottlerocketBootstrap BottlerocketBootstrap `json:"bottlerocketBootstrap,omitempty"`
+
+	// Proxy holds the https and no proxy information
+	// This is only for bottlerocket
+	// +optional
+	Proxy Proxy `json:"proxy,omitempty"`
 
 	// DryRun tells if the dry run mode is enabled, don't apply any change if it is and just output what would be done.
 	// +optional

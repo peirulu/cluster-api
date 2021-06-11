@@ -518,6 +518,20 @@ func Convert_v1beta2_BootstrapToken_To_upstreamv1beta4_BootstrapToken(in *bootst
 	return nil
 }
 
+func Convert_upstreamv1beta4_Proxy_To_v1beta2_ProxyConfiguration(in *Proxy, out *bootstrapv1.ProxyConfiguration, _ apimachineryconversion.Scope) error {
+	// Following fields do not exist in CABPK v1beta2 version:
+	// - Disabled (Not supported yet)
+	out.HTTPSProxy = in.HTTPSProxy
+	out.NoProxy = in.NoProxy
+	return nil
+}
+
+func Convert_v1beta2_ProxyConfiguration_To_upstreamv1beta4_Proxy(in *bootstrapv1.ProxyConfiguration, out *Proxy, _ apimachineryconversion.Scope) error {
+	out.HTTPSProxy = in.HTTPSProxy
+	out.NoProxy = in.NoProxy
+	return nil
+}
+
 func Convert_v1beta2_DNS_To_upstreamv1beta4_DNS(in *bootstrapv1.DNS, out *DNS, _ apimachineryconversion.Scope) error {
 	out.ImageRepository = in.ImageRepository
 	out.ImageTag = in.ImageTag
