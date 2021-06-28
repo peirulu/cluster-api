@@ -267,6 +267,16 @@ func FailuresFrom(obj *unstructured.Unstructured) (string, string, error) {
 	return failureReason, failureMessage, nil
 }
 
+// IsInitialized returns true if the Status.Initialized field on an external object is true.
+func IsInitialized(obj *unstructured.Unstructured) (bool, error) {
+	initialized, found, err := unstructured.NestedBool(obj.Object, "status", "initialized")
+	if err != nil {
+		return false, errors.Wrapf(err, "failed to determine %v %q initialized",
+			obj.GroupVersionKind(), obj.GetName())
+	}
+	return initialized && found, nil
+}
+
 // IsReady returns true if the Status.Ready field on an external object is true.
 func IsReady(obj *unstructured.Unstructured) (bool, error) {
 	ready, found, err := unstructured.NestedBool(obj.Object, "status", "ready")
@@ -275,4 +285,14 @@ func IsReady(obj *unstructured.Unstructured) (bool, error) {
 			obj.GroupVersionKind(), obj.GetName())
 	}
 	return ready && found, nil
+}
+
+func GetExternalEtcdEndpoints(externalEtcd *unstructured.Unstructured) (string, bool, error) {
+	endpoints, found, err := unstructured.NestedString(externalEtcd.Object, "status", "endpoints")
+	if err != nil {
+		return "", false, errors.Wrapf(err, "failed to get external etcd endpoints from %v %q", externalEtcd.GroupVersionKind(),
+			externalEtcd.GetName())
+	}
+
+	return endpoints, found, nil
 }

@@ -713,6 +713,22 @@ func schema_cluster_api_api_core_v1beta2_ClusterClassStatus(ref common.Reference
 							Format:      "int64",
 						},
 					},
+					"managedExternalEtcdInitialized": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ManagedExternalEtcdInitialized indicates that first etcd member's IP address is set by machine controller, so remaining etcd members can lookup the address to join the cluster",
+							Default:     false,
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"managedExternalEtcdReady": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ManagedExternalEtcdReady indicates external etcd cluster is fully provisioned",
+							Default:     false,
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
 					"deprecated": {
 						SchemaProps: spec.SchemaProps{
 							Description: "deprecated groups all the status fields that are deprecated and will be removed when all the nested field are removed.",
@@ -1240,6 +1256,13 @@ func schema_cluster_api_api_core_v1beta2_ClusterSpec(ref common.ReferenceCallbac
 							Ref:         ref("sigs.k8s.io/cluster-api/api/core/v1beta2.ContractVersionedObjectReference"),
 						},
 					},
+					"managedExternalEtcdRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ManagedExternalEtcdRef is an optional reference to an etcd provider resource that holds details for provisioning an external etcd cluster",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/cluster-api/api/core/v1beta2.ContractVersionedObjectReference"),
+						},
+					},
 					"infrastructureRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "infrastructureRef is a reference to a provider-specific resource that holds the details for provisioning infrastructure for a cluster in said provider.",
@@ -1366,6 +1389,22 @@ func schema_cluster_api_api_core_v1beta2_ClusterStatus(ref common.ReferenceCallb
 							Description: "observedGeneration is the latest generation observed by the controller.",
 							Type:        []string{"integer"},
 							Format:      "int64",
+						},
+					},
+					"managedExternalEtcdInitialized": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ManagedExternalEtcdInitialized indicates that first etcd member's IP address is set by machine controller, so remaining etcd members can lookup the address to join the cluster",
+							Default:     false,
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"managedExternalEtcdReady": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ManagedExternalEtcdReady indicates external etcd cluster is fully provisioned",
+							Default:     false,
+							Type:        []string{"boolean"},
+							Format:      "",
 						},
 					},
 					"deprecated": {

@@ -272,7 +272,10 @@ func (o *objectMover) checkProvisioningCompleted(ctx context.Context, graph *obj
 		}
 
 		if !machineObj.Status.NodeRef.IsDefined() {
-			errList = append(errList, errors.Errorf("cannot start the move operation while %q %s/%s is still provisioning the node", machineObj.GroupVersionKind(), machineObj.GetNamespace(), machineObj.GetName()))
+			_, isEtcdMachine := machineObj.Labels[clusterv1.MachineEtcdClusterLabelName]
+			if machineObj.Status.NodeRef.IsDefined() && !isEtcdMachine {
+				errList = append(errList, errors.Errorf("cannot start the move operation while %q %s/%s is still provisioning the node", machineObj.GroupVersionKind(), machineObj.GetNamespace(), machineObj.GetName()))
+			}
 		}
 	}
 

@@ -46,6 +46,7 @@ import (
 	controlplanev1 "sigs.k8s.io/cluster-api/api/controlplane/kubeadm/v1beta2"
 	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta2"
 	"sigs.k8s.io/cluster-api/controllers/clustercache"
+	"sigs.k8s.io/cluster-api/controllers/external"
 	"sigs.k8s.io/cluster-api/controlplane/kubeadm/internal"
 	runtimeclient "sigs.k8s.io/cluster-api/exp/runtime/client"
 	"sigs.k8s.io/cluster-api/feature"
@@ -80,6 +81,7 @@ const (
 // +kubebuilder:rbac:groups=cluster.x-k8s.io,resources=machines;machines/status,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=cluster.x-k8s.io,resources=machinepools,verbs=get;list;watch
 // +kubebuilder:rbac:groups=apiextensions.k8s.io,resources=customresourcedefinitions,verbs=get;list;watch
+// +kubebuilder:rbac:groups=etcdcluster.cluster.x-k8s.io,resources=*,verbs=get;list;watch;update
 
 // KubeadmControlPlaneReconciler reconciles a KubeadmControlPlane object.
 type KubeadmControlPlaneReconciler struct {
@@ -209,6 +211,31 @@ func (r *KubeadmControlPlaneReconciler) Reconcile(ctx context.Context, req ctrl.
 	patchHelper, err := patch.NewHelper(kcp, r.Client)
 	if err != nil {
 		return ctrl.Result{}, err
+	}
+	if cluster.Spec.ManagedExternalEtcdRef.IsDefined() {
+		etcdRef := cluster.Spec.ManagedExternalEtcdRef
+		externalEtcd, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, etcdRef, cluster.Namespace)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+		endpoints, found, err := external.GetExternalEtcdEndpoints(externalEtcd)
+		if err != nil {
+			return ctrl.Result{}, errors.Wrapf(err, "failed to get endpoint field from %v", externalEtcd.GetName())
+		}
+		if !found {
+			log.Info("Etcd endpoints not available")
+			return ctrl.Result{Requeue: true}, nil
+		}
+		currentEtcdEndpoints := strings.Split(endpoints, ",")
+		sort.Strings(currentEtcdEndpoints)
+		currentKCPEndpoints := kcp.Spec.KubeadmConfigSpec.ClusterConfiguration.Etcd.External.Endpoints
+		if !reflect.DeepEqual(currentEtcdEndpoints, currentKCPEndpoints) {
+			kcp.Spec.KubeadmConfigSpec.ClusterConfiguration.Etcd.External.Endpoints = currentEtcdEndpoints
+			if err := patchHelper.Patch(ctx, kcp); err != nil {
+				log.Error(err, "Failed to patch KubeadmControlPlane to update external etcd endpoints")
+				return ctrl.Result{}, err
+			}
+		}
 	}
 
 	if isPaused, requeue, err := paused.EnsurePausedCondition(ctx, r.Client, cluster, kcp); err != nil || isPaused || requeue {
@@ -675,6 +702,21 @@ func (r *KubeadmControlPlaneReconciler) reconcileDelete(ctx context.Context, con
 	log := ctrl.LoggerFrom(ctx)
 	log.Info("Reconcile KubeadmControlPlane deletion")
 
+	// Gets all machines, not just control plane machines.
+	allMachines, err := r.managementCluster.GetMachinesForCluster(ctx, controlPlane.Cluster)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	if controlPlane.Cluster.Spec.ManagedExternalEtcdRef.IsDefined() {
+		for _, machine := range allMachines {
+			if util.IsEtcdMachine(machine) {
+				// remove external etcd-only machines from the "allMachines" collection so that the controlplane machines don't wait for etcd to be deleted first
+				delete(allMachines, machine.Name)
+			}
+		}
+	}
+
 	// If no control plane machines remain, remove the finalizer
 	if len(controlPlane.Machines) == 0 {
 		controlPlane.DeletingReason = controlplanev1.KubeadmControlPlaneDeletingDeletionCompletedReason
@@ -695,14 +737,6 @@ func (r *KubeadmControlPlaneReconciler) reconcileDelete(ctx context.Context, con
 	// However, during delete we are hiding the counter (1 of x) because it does not make sense given that
 	// all the machines are deleted in parallel.
 	v1beta1conditions.SetAggregate(controlPlane.KCP, controlplanev1.MachinesReadyV1Beta1Condition, controlPlane.Machines.ConditionGetters(), v1beta1conditions.AddSourceRef())
-
-	// Gets all machines, not just control plane machines.
-	allMachines, err := r.managementCluster.GetMachinesForCluster(ctx, controlPlane.Cluster)
-	if err != nil {
-		controlPlane.DeletingReason = controlplanev1.KubeadmControlPlaneDeletingInternalErrorReason
-		controlPlane.DeletingMessage = "Please check controller logs for errors" //nolint:goconst // Not making this a constant for now
-		return ctrl.Result{}, err
-	}
 
 	allMachinePools := &clusterv1.MachinePoolList{}
 	// Get all machine pools.

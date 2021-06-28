@@ -496,6 +496,11 @@ type ClusterSpec struct {
 	// +optional
 	ControlPlaneRef ContractVersionedObjectReference `json:"controlPlaneRef,omitempty,omitzero"`
 
+	// ManagedExternalEtcdRef is an optional reference to an etcd provider resource that holds details
+	// for provisioning an external etcd cluster
+	// +optional
+	ManagedExternalEtcdRef ContractVersionedObjectReference `json:"managedExternalEtcdRef,omitempty"`
+
 	// infrastructureRef is a reference to a provider-specific resource that holds the details
 	// for provisioning infrastructure for a cluster in said provider.
 	// +optional
@@ -1466,6 +1471,15 @@ type ClusterStatus struct {
 	// +optional
 	// +kubebuilder:validation:Minimum=1
 	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+
+	// ManagedExternalEtcdInitialized indicates that first etcd member's IP address is set by machine controller,
+	// so remaining etcd members can lookup the address to join the cluster
+	// +optional
+	ManagedExternalEtcdInitialized bool `json:"managedExternalEtcdInitialized"`
+
+	// ManagedExternalEtcdReady indicates external etcd cluster is fully provisioned
+	// +optional
+	ManagedExternalEtcdReady bool `json:"managedExternalEtcdReady"`
 
 	// deprecated groups all the status fields that are deprecated and will be removed when all the nested field are removed.
 	// +optional

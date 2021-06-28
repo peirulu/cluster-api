@@ -38,6 +38,7 @@ import (
 	"sigs.k8s.io/cluster-api/feature"
 	"sigs.k8s.io/cluster-api/internal/topology/ownerrefs"
 	"sigs.k8s.io/cluster-api/util"
+	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/kubeconfig"
 	"sigs.k8s.io/cluster-api/util/test/builder"
 )
@@ -1667,6 +1668,94 @@ func Test_propagateMachineTaintsToNode(t *testing.T) {
 			g.Expect(tt.node.Spec.Taints).To(Equal(tt.expectedTaints))
 			g.Expect(tt.node.Annotations).To(HaveKey(clusterv1.TaintsFromMachineAnnotation))
 			g.Expect(tt.node.Annotations[clusterv1.TaintsFromMachineAnnotation]).To(Equal(tt.expectedAnnotation))
+		})
+	}
+}
+
+func TestReconcileNodeForEtcdMachines(t *testing.T) {
+	testCases := []struct {
+		name    string
+		machine *clusterv1.Machine
+	}{
+		{
+			name: "with providerID",
+			machine: &clusterv1.Machine{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						clusterv1.MachineEtcdClusterLabelName: "true",
+					},
+				},
+				Spec: clusterv1.MachineSpec{
+					ProviderID: "ID",
+				},
+			},
+		},
+		{
+			name: "without providerID",
+			machine: &clusterv1.Machine{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						clusterv1.MachineEtcdClusterLabelName: "true",
+					},
+				},
+				Spec: clusterv1.MachineSpec{},
+			},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			g := NewWithT(t)
+			r := Reconciler{Client: env}
+			s := &scope{
+				cluster: &clusterv1.Cluster{},
+				machine: tc.machine,
+			}
+			g.Expect(r.reconcileNode(ctx, s)).To(Equal(ctrl.Result{}))
+			g.Expect(conditions.Get(tc.machine, clusterv1.MachineNodeHealthyCondition)).To(BeNil())
+		})
+	}
+}
+
+func TestReconcileNodeForEtcdMachines(t *testing.T) {
+	testCases := []struct {
+		name    string
+		machine *clusterv1.Machine
+	}{
+		{
+			name: "with providerID",
+			machine: &clusterv1.Machine{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						clusterv1.MachineEtcdClusterLabelName: "true",
+					},
+				},
+				Spec: clusterv1.MachineSpec{
+					ProviderID: "ID",
+				},
+			},
+		},
+		{
+			name: "without providerID",
+			machine: &clusterv1.Machine{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						clusterv1.MachineEtcdClusterLabelName: "true",
+					},
+				},
+				Spec: clusterv1.MachineSpec{},
+			},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			g := NewWithT(t)
+			r := Reconciler{Client: env}
+			s := &scope{
+				cluster: &clusterv1.Cluster{},
+				machine: tc.machine,
+			}
+			g.Expect(r.reconcileNode(ctx, s)).To(Equal(ctrl.Result{}))
+			g.Expect(conditions.Get(tc.machine, clusterv1.MachineNodeHealthyCondition)).To(BeNil())
 		})
 	}
 }

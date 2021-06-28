@@ -618,6 +618,7 @@ func (in *ClusterSpec) DeepCopyInto(out *ClusterSpec) {
 	in.ClusterNetwork.DeepCopyInto(&out.ClusterNetwork)
 	out.ControlPlaneEndpoint = in.ControlPlaneEndpoint
 	out.ControlPlaneRef = in.ControlPlaneRef
+	out.ManagedExternalEtcdRef = in.ManagedExternalEtcdRef
 	out.InfrastructureRef = in.InfrastructureRef
 	in.Topology.DeepCopyInto(&out.Topology)
 	if in.AvailabilityGates != nil {
