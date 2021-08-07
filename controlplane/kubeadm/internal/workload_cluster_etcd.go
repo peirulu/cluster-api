@@ -19,6 +19,7 @@ package internal
 import (
 	"context"
 
+	"github.com/blang/semver/v4"
 	"github.com/pkg/errors"
 
 	bootstrapv1 "sigs.k8s.io/cluster-api/api/bootstrap/kubeadm/v1beta2"
@@ -48,6 +49,14 @@ func (w *Workload) UpdateEtcdExternalInKubeadmConfigMap(etcdExternal bootstrapv1
 		c.Etcd.Local = bootstrapv1.LocalEtcd{}
 		c.Etcd.External = etcdExternal
 	}
+}
+
+func (w *Workload) UpdateExternalEtcdEndpointsInKubeadmConfigMap(ctx context.Context, endpoints []string, version semver.Version) error {
+	return w.UpdateClusterConfiguration(ctx, version, func(c *bootstrapv1.ClusterConfiguration) {
+		if c.Etcd.External.IsDefined() {
+			c.Etcd.External.Endpoints = endpoints
+		}
+	})
 }
 
 // RemoveEtcdMember removes the etcd member from the target cluster's etcd cluster.

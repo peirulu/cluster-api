@@ -40,6 +40,7 @@ type ClusterBuilder struct {
 	infrastructureCluster *unstructured.Unstructured
 	controlPlane          *unstructured.Unstructured
 	network               clusterv1.ClusterNetwork
+	etcd                  *unstructured.Unstructured
 }
 
 // Cluster returns a ClusterBuilder with the given name and namespace.
@@ -77,6 +78,12 @@ func (c *ClusterBuilder) WithInfrastructureCluster(t *unstructured.Unstructured)
 // WithControlPlane adds the passed ControlPlane to the ClusterBuilder.
 func (c *ClusterBuilder) WithControlPlane(t *unstructured.Unstructured) *ClusterBuilder {
 	c.controlPlane = t
+	return c
+}
+
+// WithManagedEtcd adds the passed etcd to the ClusterBuilder.
+func (c *ClusterBuilder) WithManagedEtcd(t *unstructured.Unstructured) *ClusterBuilder {
+	c.etcd = t
 	return c
 }
 

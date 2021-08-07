@@ -120,6 +120,11 @@ func GetManagedAnnotations(m *clusterv1.Machine, additionalSyncMachineAnnotation
 	return managedAnnotations
 }
 
+// HasAnnotation returns true if the object has the specified annotation.
+func HasAnnotation(o metav1.Object, annotation string) bool {
+	return hasAnnotation(o, annotation)
+}
+
 // hasAnnotation returns true if the object has the specified annotation.
 func hasAnnotation(o metav1.Object, annotation string) bool {
 	annotations := o.GetAnnotations()

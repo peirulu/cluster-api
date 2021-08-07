@@ -199,6 +199,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (retRes ct
 
 	alwaysReconcile := []clusterReconcileFunc{
 		r.reconcileInfrastructure,
+		r.reconcileEtcdCluster,
 		r.reconcileControlPlane,
 		r.getDescendants,
 	}
@@ -226,7 +227,6 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (retRes ct
 		alwaysReconcile,
 		r.reconcileKubeconfig,
 		r.reconcileV1Beta1ControlPlaneInitialized,
-		r.reconcileEtcdCluster,
 	)
 	return doReconcile(ctx, reconcileNormal, s)
 }

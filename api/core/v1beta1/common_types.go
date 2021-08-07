@@ -171,6 +171,9 @@ const (
 	// will receive the resulting object.
 	TopologyDryRunAnnotation = "topology.cluster.x-k8s.io/dry-run"
 
+	// ControlPlaneUpgradeCompletedAnnotation is set by the controlplane on the external etcd object after controlplane upgrade is completed.
+	ControlPlaneUpgradeCompletedAnnotation = "controlplane.cluster.x-k8s.io/upgrade-complete"
+
 	// ReplicasManagedByAnnotation is an annotation that indicates external (non-Cluster API) management of infra scaling.
 	// The practical effect of this is that the capi "replica" count should be passively derived from the number of observed infra machines,
 	// instead of being a source of truth for eventual consistency.
@@ -210,6 +213,10 @@ const (
 	// Note: While the upgrade is blocked changes made to the Cluster Topology will be delayed propagating to the underlying
 	// objects while the object is waiting for upgrade.
 	BeforeClusterUpgradeHookAnnotationPrefix = "before-upgrade.hook.cluster.cluster.x-k8s.io"
+
+	// SkipControlPlanePauseManagedEtcdAnnotation indicates that the cluster controller should not pause or unpause
+	// the control plane after the managed etcd cluster becomes not-ready/ready.
+	SkipControlPlanePauseManagedEtcdAnnotation = "cluster.x-k8s.io/skip-pause-cp-managed-etcd"
 )
 
 // MachineSetPreflightCheck defines a valid MachineSet preflight check.
