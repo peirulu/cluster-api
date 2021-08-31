@@ -142,6 +142,15 @@ func (r *InitConfiguration) IsDefined() bool {
 	return !reflect.DeepEqual(r, &InitConfiguration{})
 }
 
+// RegistryMirrorConfiguration holds the settings for image registry mirror
+type RegistryMirrorConfiguration struct {
+	// Endpoint defines the registry mirror endpoint to use for pulling images
+	Endpoint string `json:"endpoint,omitempty"`
+
+	// CACert defines the CA cert for the registry mirror
+	CACert string `json:"caCert,omitempty"`
+}
+
 // ClusterConfiguration contains cluster-wide configuration for a kubeadm cluster.
 // +kubebuilder:validation:MinProperties=1
 type ClusterConfiguration struct {
@@ -159,6 +168,12 @@ type ClusterConfiguration struct {
 	// This is only for bottlerocket
 	// +optional
 	Proxy ProxyConfiguration `json:"proxy,omitempty"`
+
+	// RegistryMirror holds the image registry mirror information
+	// This is only for bottlerocket
+	// +optional
+	RegistryMirror RegistryMirrorConfiguration `json:"registryMirror,omitempty"`
+
 	// etcd holds configuration for etcd.
 	// NB: This value defaults to a Local (stacked) etcd
 	// +optional
@@ -692,6 +707,12 @@ type JoinConfiguration struct {
 	// This is only for bottlerocket
 	// +optional
 	Proxy ProxyConfiguration `json:"proxy,omitempty"`
+
+	// RegistryMirror holds the image registry mirror information
+	// This is only for bottlerocket
+	// +optional
+	RegistryMirror RegistryMirrorConfiguration `json:"registryMirror,omitempty"`
+
 	// nodeRegistration holds fields that relate to registering the new control-plane node to the cluster.
 	// When used in the context of control plane nodes, NodeRegistration should remain consistent
 	// across both InitConfiguration and JoinConfiguration

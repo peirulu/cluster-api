@@ -123,6 +123,8 @@ func (webhook *KubeadmControlPlane) ValidateUpdate(_ context.Context, oldK, newK
 		// metadata
 		{"metadata", "*"},
 		// spec.kubeadmConfigSpec.clusterConfiguration
+		{spec, kubeadmConfigSpec, clusterConfiguration, "bottlerocketBootstrap", "*"},
+		{spec, kubeadmConfigSpec, clusterConfiguration, "pause", "*"},
 		{spec, kubeadmConfigSpec, clusterConfiguration, "etcd"},
 		{spec, kubeadmConfigSpec, clusterConfiguration, "etcd", "*"},
 		{spec, kubeadmConfigSpec, clusterConfiguration, "etcd", "local"},
@@ -153,6 +155,8 @@ func (webhook *KubeadmControlPlane) ValidateUpdate(_ context.Context, oldK, newK
 		{spec, kubeadmConfigSpec, initConfiguration, timeouts},
 		{spec, kubeadmConfigSpec, initConfiguration, timeouts, "*"},
 		// spec.kubeadmConfigSpec.joinConfiguration
+		{spec, kubeadmConfigSpec, joinConfiguration, "bottlerocketBootstrap", "*"},
+		{spec, kubeadmConfigSpec, joinConfiguration, "pause", "*"},
 		{spec, kubeadmConfigSpec, joinConfiguration, nodeRegistration},
 		{spec, kubeadmConfigSpec, joinConfiguration, nodeRegistration, "*"},
 		{spec, kubeadmConfigSpec, joinConfiguration, patches, directory},

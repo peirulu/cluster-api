@@ -760,6 +760,18 @@ func TestKubeadmControlPlaneValidateUpdate(t *testing.T) {
 	validEncryptionAlgorithm := before.DeepCopy()
 	validEncryptionAlgorithm.Spec.KubeadmConfigSpec.ClusterConfiguration.EncryptionAlgorithm = bootstrapv1.EncryptionAlgorithmRSA3072
 
+	validUpdateClusterConfPauseImage := before.DeepCopy()
+	validUpdateClusterConfPauseImage.Spec.KubeadmConfigSpec.ClusterConfiguration.Pause = bootstrapv1.Pause{ImageRepository: "registry.k8s.io/pause", ImageTag: "v1.1.0+new"}
+
+	validUpdateClusterConfBRBootstrapImage := before.DeepCopy()
+	validUpdateClusterConfBRBootstrapImage.Spec.KubeadmConfigSpec.ClusterConfiguration.BottlerocketBootstrap = bootstrapv1.BottlerocketBootstrap{ImageRepository: "registry.k8s.io/bottlerocketbootstrap", ImageTag: "v1.1.0+new"}
+
+	validUpdateJoinConfPauseImage := before.DeepCopy()
+	validUpdateJoinConfPauseImage.Spec.KubeadmConfigSpec.JoinConfiguration.Pause = bootstrapv1.Pause{ImageRepository: "registry.k8s.io/pause", ImageTag: "v1.1.0+new"}
+
+	validUpdateJoinConfBRBootstrapImage := before.DeepCopy()
+	validUpdateJoinConfBRBootstrapImage.Spec.KubeadmConfigSpec.JoinConfiguration.BottlerocketBootstrap = bootstrapv1.BottlerocketBootstrap{ImageRepository: "registry.k8s.io/bottlerocketbootstrap", ImageTag: "v1.1.0+new"}
+
 	beforeTaints := before.DeepCopy()
 	beforeTaints.Spec.MachineTemplate.Spec.Taints = []clusterv1.MachineTaint{
 		{
@@ -1143,6 +1155,30 @@ func TestKubeadmControlPlaneValidateUpdate(t *testing.T) {
 			name:   "should allow to update encryptionAlgorithm",
 			before: before,
 			kcp:    validEncryptionAlgorithm,
+		},
+		{
+			name:      "should allow changes to cluster configuration pause image",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateClusterConfPauseImage,
+		},
+		{
+			name:      "should allow changes to cluster configuration bottlerocket bootstrap image",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateClusterConfBRBootstrapImage,
+		},
+		{
+			name:      "should allow changes to join configuration pause image",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateJoinConfPauseImage,
+		},
+		{
+			name:      "should allow changes to join configuration bottlerocket bootstrap image",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateJoinConfBRBootstrapImage,
 		},
 		{
 			name:                "should not allow to add taints when feature gate is disabled",
