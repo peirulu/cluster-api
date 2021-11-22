@@ -420,6 +420,30 @@ func (src *ClusterConfiguration) GetAdditionalData(data *upstream.AdditionalData
 	}
 }
 
+func Convert_upstreamv1beta3_BottlerocketBootstrap_To_v1beta2_BottlerocketBootstrap(in *BottlerocketBootstrap, out *bootstrapv1.BottlerocketBootstrap, s apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
+func Convert_v1beta2_BottlerocketBootstrap_To_upstreamv1beta3_BottlerocketBootstrap(in *bootstrapv1.BottlerocketBootstrap, out *BottlerocketBootstrap, s apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
+func Convert_upstreamv1beta3_Pause_To_v1beta2_Pause(in *Pause, out *bootstrapv1.Pause, s apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
+func Convert_v1beta2_Pause_To_upstreamv1beta3_Pause(in *bootstrapv1.Pause, out *Pause, s apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
 func Convert_v1beta2_ClusterConfiguration_To_upstreamv1beta3_ClusterConfiguration(in *bootstrapv1.ClusterConfiguration, out *ClusterConfiguration, s apimachineryconversion.Scope) error {
 	return autoConvert_v1beta2_ClusterConfiguration_To_upstreamv1beta3_ClusterConfiguration(in, out, s)
 }
