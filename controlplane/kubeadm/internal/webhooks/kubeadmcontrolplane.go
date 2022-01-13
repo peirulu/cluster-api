@@ -91,6 +91,7 @@ func (webhook *KubeadmControlPlane) ValidateCreate(_ context.Context, k *control
 
 const (
 	spec                 = "spec"
+	status               = "status"
 	kubeadmConfigSpec    = "kubeadmConfigSpec"
 	clusterConfiguration = "clusterConfiguration"
 	initConfiguration    = "initConfiguration"
@@ -198,6 +199,7 @@ func (webhook *KubeadmControlPlane) ValidateUpdate(_ context.Context, oldK, newK
 		{spec, "machineNaming", "*"},
 		{spec, "rollout"},
 		{spec, "rollout", "*"},
+		{status, "version"},
 	}
 
 	allErrs := validateKubeadmControlPlaneSpec(newK.Spec, field.NewPath("spec"))
