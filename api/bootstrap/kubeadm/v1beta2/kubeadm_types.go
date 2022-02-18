@@ -164,6 +164,11 @@ type ClusterConfiguration struct {
 	// +optional
 	BottlerocketBootstrap BottlerocketBootstrap `json:"bottlerocketBootstrap,omitempty"`
 
+	// BottlerocketControl holds the image source for control container
+	// This is only for bottlerocket
+	// +optional
+	BottlerocketControl BottlerocketControl `json:"bottlerocketControl,omitempty"`
+
 	// Proxy holds the https and no proxy information
 	// This is only for bottlerocket
 	// +optional
@@ -280,6 +285,26 @@ type Pause struct {
 // BottlerocketBootstrap holds the settings of kubeadm bootstrap container for bottlerocket nodes
 // This setting is ONLY for bottlerocket nodes.
 type BottlerocketBootstrap struct {
+	// imageRepository sets the container registry to pull images from.
+	// if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=512
+	ImageRepository string `json:"imageRepository,omitempty"`
+
+	// imageTag allows to specify a tag for the image.
+	// In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	ImageTag string `json:"imageTag,omitempty"`
+
+	// TODO: evaluate if we need also a ImageName based on user feedbacks
+}
+
+// BottlerocketControl holds the settings of control container for bottlerocket nodes
+// This setting is ONLY for bottlerocket nodes.
+type BottlerocketControl struct {
 	// imageRepository sets the container registry to pull images from.
 	// if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
 	// +optional
@@ -702,6 +727,11 @@ type JoinConfiguration struct {
 	// This is only for bottlerocket
 	// +optional
 	BottlerocketBootstrap BottlerocketBootstrap `json:"bottlerocketBootstrap,omitempty"`
+
+	// BottlerocketControl holds the image source for control container
+	// This is only for bottlerocket
+	// +optional
+	BottlerocketControl BottlerocketControl `json:"bottlerocketControl,omitempty"`
 
 	// Proxy holds the https and no proxy information
 	// This is only for bottlerocket

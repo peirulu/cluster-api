@@ -317,12 +317,17 @@ func TestUpdateUpdateClusterConfigurationInKubeadmConfigMap(t *testing.T) {
 					clusterConfigurationKey: utilyaml.Raw(`
 						apiServer: {}
 						apiVersion: kubeadm.k8s.io/v1beta3
+						bottlerocketBootstrap: {}
+						bottlerocketControl: {}
 						controllerManager: {}
 						dns: {}
 						etcd: {}
 						kind: ClusterConfiguration
 						kubernetesVersion: v1.23.2
 						networking: {}
+						pause: {}
+						proxy: {}
+						registryMirror: {}
 						scheduler: {}
 						`),
 				},
@@ -357,6 +362,8 @@ func TestUpdateUpdateClusterConfigurationInKubeadmConfigMap(t *testing.T) {
 					clusterConfigurationKey: utilyaml.Raw(`
 						apiServer: {}
 						apiVersion: kubeadm.k8s.io/v1beta3
+						bottlerocketBootstrap: {}
+						bottlerocketControl: {}
 						certificatesDir: foo
 						controllerManager: {}
 						dns: {}
@@ -364,6 +371,9 @@ func TestUpdateUpdateClusterConfigurationInKubeadmConfigMap(t *testing.T) {
 						kind: ClusterConfiguration
 						kubernetesVersion: v1.23.2
 						networking: {}
+						pause: {}
+						proxy: {}
+						registryMirror: {}
 						scheduler: {}
 						`),
 				},
@@ -550,12 +560,17 @@ func TestUpdateApiServerInKubeadmConfigMap(t *testing.T) {
 				    mountPath: /foo/bar
 				    name: mount2
 				apiVersion: kubeadm.k8s.io/v1beta3
+				bottlerocketBootstrap: {}
+				bottlerocketControl: {}
 				controllerManager: {}
 				dns: {}
 				etcd: {}
 				kind: ClusterConfiguration
 				kubernetesVersion: v1.23.1
 				networking: {}
+				pause: {}
+				proxy: {}
+				registryMirror: {}
 				scheduler: {}
 				`),
 		},
@@ -597,12 +612,16 @@ func TestUpdateApiServerInKubeadmConfigMap(t *testing.T) {
 				    mountPath: /foo/bar
 				    name: mount2
 				apiVersion: kubeadm.k8s.io/v1beta4
+				bottlerocketBootstrap: {}
+				bottlerocketControl: {}
 				controllerManager: {}
 				dns: {}
 				etcd: {}
 				kind: ClusterConfiguration
 				kubernetesVersion: v1.31.1
 				networking: {}
+				pause: {}
+				registryMirror: {}
 				proxy: {}
 				scheduler: {}
 				`),
@@ -674,6 +693,8 @@ func TestUpdateControllerManagerInKubeadmConfigMap(t *testing.T) {
 			wantClusterConfiguration: utilyaml.Raw(`
 				apiServer: {}
 				apiVersion: kubeadm.k8s.io/v1beta3
+				bottlerocketBootstrap: {}
+				bottlerocketControl: {}
 				controllerManager:
 				  extraArgs:
 				    bar: baz
@@ -687,6 +708,9 @@ func TestUpdateControllerManagerInKubeadmConfigMap(t *testing.T) {
 				kind: ClusterConfiguration
 				kubernetesVersion: v1.23.1
 				networking: {}
+				pause: {}
+				proxy: {}
+				registryMirror: {}
 				scheduler: {}
 				`),
 		},
@@ -757,12 +781,17 @@ func TestUpdateSchedulerInKubeadmConfigMap(t *testing.T) {
 			wantClusterConfiguration: utilyaml.Raw(`
 				apiServer: {}
 				apiVersion: kubeadm.k8s.io/v1beta3
+				bottlerocketBootstrap: {}
+				bottlerocketControl: {}
 				controllerManager: {}
 				dns: {}
 				etcd: {}
 				kind: ClusterConfiguration
 				kubernetesVersion: v1.23.1
 				networking: {}
+				pause: {}
+				proxy: {}
+				registryMirror: {}
 				scheduler:
 				  extraArgs:
 				    bar: baz

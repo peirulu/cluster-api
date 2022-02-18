@@ -63,6 +63,8 @@ func TestUpdateEtcdExternalInKubeadmConfigMap(t *testing.T) {
 			wantClusterConfiguration: utilyaml.Raw(`
 				apiServer: {}
 				apiVersion: kubeadm.k8s.io/v1beta3
+				bottlerocketBootstrap: {}
+				bottlerocketControl: {}
 				controllerManager: {}
 				dns: {}
 				etcd:
@@ -75,6 +77,9 @@ func TestUpdateEtcdExternalInKubeadmConfigMap(t *testing.T) {
 				kind: ClusterConfiguration
 				kubernetesVersion: v1.23.1
 				networking: {}
+				pause: {}
+				proxy: {}
+				registryMirror: {}
 				scheduler: {}
 				`),
 		},
@@ -140,6 +145,8 @@ func TestUpdateEtcdLocalInKubeadmConfigMap(t *testing.T) {
 			wantClusterConfiguration: utilyaml.Raw(`
 				apiServer: {}
 				apiVersion: kubeadm.k8s.io/v1beta3
+				bottlerocketBootstrap: {}
+				bottlerocketControl: {}
 				controllerManager: {}
 				dns: {}
 				etcd:
@@ -152,6 +159,9 @@ func TestUpdateEtcdLocalInKubeadmConfigMap(t *testing.T) {
 				kind: ClusterConfiguration
 				kubernetesVersion: v1.23.1
 				networking: {}
+				pause: {}
+				proxy: {}
+				registryMirror: {}
 				scheduler: {}
 				`),
 		},

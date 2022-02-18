@@ -152,6 +152,8 @@ func TestMarshalClusterConfigurationForVersion(t *testing.T) {
 			want: "apiServer:\n" +
 				"  timeoutForControlPlane: 30s\n" +
 				"apiVersion: kubeadm.k8s.io/v1beta3\n" +
+				"bottlerocketBootstrap: {}\n" +
+				"bottlerocketControl: {}\n" +
 				"clusterName: mycluster\n" +
 				"controlPlaneEndpoint: myControlPlaneEndpoint:6443\n" +
 				"controllerManager: {}\n" +
@@ -160,6 +162,9 @@ func TestMarshalClusterConfigurationForVersion(t *testing.T) {
 				"kind: ClusterConfiguration\n" +
 				"kubernetesVersion: v1.22.0\n" +
 				"networking:\n" +
+				"pause: {}\n" +
+				"proxy: {}\n" +
+				"registryMirror: {}\n" +
 				"  dnsDomain: myDNSDomain\n" +
 				"  podSubnet: myPodSubnet\n" +
 				"  serviceSubnet: myServiceSubnet\n" +
@@ -176,6 +181,8 @@ func TestMarshalClusterConfigurationForVersion(t *testing.T) {
 			},
 			want: "apiServer: {}\n" +
 				"apiVersion: kubeadm.k8s.io/v1beta4\n" +
+				"bottlerocketBootstrap: {}\n" +
+				"bottlerocketControl: {}\n" +
 				"clusterName: mycluster\n" +
 				"controlPlaneEndpoint: myControlPlaneEndpoint:6443\n" +
 				"controllerManager: {}\n" +
@@ -184,6 +191,9 @@ func TestMarshalClusterConfigurationForVersion(t *testing.T) {
 				"kind: ClusterConfiguration\n" +
 				"kubernetesVersion: v1.31.0\n" +
 				"networking:\n" +
+				"pause: {}\n" +
+				"proxy: {}\n" +
+				"registryMirror: {}\n" +
 				"  dnsDomain: myDNSDomain\n" +
 				"  podSubnet: myPodSubnet\n" +
 				"  serviceSubnet: myServiceSubnet\n" +
@@ -300,12 +310,17 @@ func TestMarshalJoinConfigurationForVersion(t *testing.T) {
 				version: semver.MustParse("1.22.0"),
 			},
 			want: "apiVersion: kubeadm.k8s.io/v1beta3\n" + "" +
+				"bottlerocketBootstrap: {}\n" +
+				"bottlerocketControl: {}\n" +
 				"discovery: {}\n" +
 				"kind: JoinConfiguration\n" +
 				"nodeRegistration:\n" +
 				"  ignorePreflightErrors:\n" +
 				"  - some-preflight-check\n" +
-				"  taints: null\n",
+				"  taints: null\n" +
+				"pause: {}\n" +
+				"proxy: {}\n" +
+				"registryMirror: {}\n",
 			wantErr: false,
 		},
 		{

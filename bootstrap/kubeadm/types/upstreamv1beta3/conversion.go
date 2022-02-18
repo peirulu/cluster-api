@@ -444,6 +444,18 @@ func Convert_v1beta2_Pause_To_upstreamv1beta3_Pause(in *bootstrapv1.Pause, out *
 	return nil
 }
 
+func Convert_upstreamv1beta3_BottlerocketControl_To_v1beta2_BottlerocketControl(in *BottlerocketControl, out *bootstrapv1.BottlerocketControl, s apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
+func Convert_v1beta2_BottlerocketControl_To_upstreamv1beta3_BottlerocketControl(in *bootstrapv1.BottlerocketControl, out *BottlerocketControl, s apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
 func Convert_v1beta2_ClusterConfiguration_To_upstreamv1beta3_ClusterConfiguration(in *bootstrapv1.ClusterConfiguration, out *ClusterConfiguration, s apimachineryconversion.Scope) error {
 	return autoConvert_v1beta2_ClusterConfiguration_To_upstreamv1beta3_ClusterConfiguration(in, out, s)
 }
