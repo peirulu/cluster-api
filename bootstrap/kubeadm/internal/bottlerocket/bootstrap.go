@@ -3,12 +3,6 @@
 package bottlerocket
 
 const (
-	adminContainerInitTemplate = `{{ define "adminContainerInitSettings" -}}
-[settings.host-containers.admin]
-enabled = true
-user-data = "{{.AdminContainerUserData}}"
-{{- end -}}
-`
 	kubernetesInitTemplate = `{{ define "kubernetesInitSettings" -}}
 [settings.kubernetes]
 cluster-domain = "cluster.local"
@@ -16,17 +10,52 @@ standalone-mode = true
 authentication-mode = "tls"
 server-tls-bootstrap = false
 pod-infra-container-image = "{{.PauseContainerSource}}"
+{{- if (ne .ProviderId "")}}
+provider-id = "{{.ProviderId}}"
+{{- end -}}
 {{- end -}}
 `
 
-	bootstrapHostContainerTemplate = `{{define "bootstrapHostContainerSettings" -}}
-[settings.host-containers.kubeadm-bootstrap]
+	hostContainerTemplate = `{{define "hostContainerSettings" -}}
+[settings.host-containers.{{.Name}}]
 enabled = true
-superpowered = true
-source = "{{.BootstrapContainerSource}}"
-user-data = "{{.BootstrapContainerUserData}}"
+superpowered = {{.Superpowered}}
+{{- if (ne (imageURL .ImageRepository .ImageTag) "")}}
+source = "{{imageURL .ImageRepository .ImageTag}}"
+{{- end -}}
+{{- if (ne .UserData "")}}
+user-data = "{{.UserData}}"
+{{- end -}}
 {{- end -}}
 `
+
+	hostContainerSliceTemplate = `{{define "hostContainerSlice" -}}
+{{- range $hContainer := .HostContainers }}
+{{template "hostContainerSettings" $hContainer }}
+{{- end -}}
+{{- end -}}
+`
+
+	bootstrapContainerTemplate = `{{ define "bootstrapContainerSettings" -}}
+[settings.bootstrap-containers.{{.Name}}]
+essential = {{.Essential}}
+mode = "{{.Mode}}"
+{{- if (ne (imageURL .ImageRepository .ImageTag) "")}}
+source = "{{imageURL .ImageRepository .ImageTag}}"
+{{- end -}}
+{{- if (ne .UserData "")}}
+user-data = "{{.UserData}}"
+{{- end -}}
+{{- end -}}
+`
+
+	bootstrapContainerSliceTemplate = `{{ define "bootstrapContainerSlice" -}}
+{{- range $bContainer := .BootstrapContainers }}
+{{template "bootstrapContainerSettings" $bContainer }}
+{{- end -}}
+{{- end -}}
+`
+
 	networkInitTemplate = `{{ define "networkInitSettings" -}}
 [settings.network]
 https-proxy = "{{.HTTPSProxyEndpoint}}"
@@ -55,19 +84,13 @@ trusted=true
 {{- end -}}
 `
 
-	controlContainerTemplate = `{{ define "controlContainerSettings" -}}
-[settings.host-containers.control]
-enabled = true
-superpowered = false
-source = "{{.ControlContainerSource}}"
-{{- end -}}
-`
-
-	bottlerocketNodeInitSettingsTemplate = `{{template "bootstrapHostContainerSettings" .}}
-
-{{template "adminContainerInitSettings" .}}
+	bottlerocketNodeInitSettingsTemplate = `{{template "hostContainerSlice" .}}
 
 {{template "kubernetesInitSettings" .}}
+
+{{- if .BootstrapContainers}}
+{{template "bootstrapContainerSlice" .}}
+{{- end -}}
 
 {{- if (ne .HTTPSProxyEndpoint "")}}
 {{template "networkInitSettings" .}}
@@ -87,10 +110,6 @@ source = "{{.ControlContainerSource}}"
 
 {{- if (ne .Taints "")}}
 {{template "taintsTemplate" .}}
-{{- end -}}
-
-{{- if (ne .ControlContainerSource "")}}
-{{template "controlContainerSettings" .}}
 {{- end -}}
 `
 )

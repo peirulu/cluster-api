@@ -23,13 +23,15 @@ const (
 )
 
 type BottlerocketConfig struct {
-	Pause                       bootstrapv1.Pause
-	BottlerocketBootstrap       bootstrapv1.BottlerocketBootstrap
-	BottlerocketControl         bootstrapv1.BottlerocketControl
-	ProxyConfiguration          bootstrapv1.ProxyConfiguration
-	RegistryMirrorConfiguration bootstrapv1.RegistryMirrorConfiguration
-	KubeletExtraArgs            []bootstrapv1.Arg
-	Taints                      []corev1.Taint
+	Pause                                 bootstrapv1.Pause
+	BottlerocketBootstrap                 bootstrapv1.BottlerocketBootstrap
+	BottlerocketControl                   bootstrapv1.BottlerocketControl
+	ProxyConfiguration                    bootstrapv1.ProxyConfiguration
+	RegistryMirrorConfiguration           bootstrapv1.RegistryMirrorConfiguration
+	KubeletExtraArgs                      []bootstrapv1.Arg
+	Taints                                []corev1.Taint
+	BottlerocketCustomHostContainers      []bootstrapv1.BottlerocketHostContainer
+	BottlerocketCustomBootstrapContainers []bootstrapv1.BottlerocketBootstrapContainer
 }
 
 type BottlerocketSettingsInput struct {
@@ -44,6 +46,9 @@ type BottlerocketSettingsInput struct {
 	RegistryMirrorCACert       string
 	NodeLabels                 string
 	Taints                     string
+	ProviderId                 string
+	HostContainers             []bootstrapv1.BottlerocketHostContainer
+	BootstrapContainers        []bootstrapv1.BottlerocketBootstrapContainer
 }
 
 type HostPath struct {
@@ -86,16 +91,29 @@ func generateAdminContainerUserData(kind string, tpl string, data interface{}) (
 	return out.Bytes(), nil
 }
 
+func imageURL(imageRepository string, imageTag string) string {
+	if imageRepository != "" && imageTag != "" {
+		return fmt.Sprintf("%s:%s", imageRepository, imageTag)
+	}
+	return ""
+}
+
 func generateNodeUserData(kind string, tpl string, data interface{}) ([]byte, error) {
-	tm := template.New(kind).Funcs(template.FuncMap{"stringsJoin": strings.Join})
-	if _, err := tm.Parse(bootstrapHostContainerTemplate); err != nil {
-		return nil, errors.Wrapf(err, "failed to parse hostContainer %s template", kind)
+	tm := template.New(kind).Funcs(template.FuncMap{
+		"stringsJoin": strings.Join,
+		"imageURL":    imageURL,
+	})
+	if _, err := tm.Parse(hostContainerTemplate); err != nil {
+		return nil, errors.Wrapf(err, "failed to parse hostContainerSettings %s template", kind)
 	}
-	if _, err := tm.Parse(adminContainerInitTemplate); err != nil {
-		return nil, errors.Wrapf(err, "failed to parse adminContainer %s template", kind)
+	if _, err := tm.Parse(hostContainerSliceTemplate); err != nil {
+		return nil, errors.Wrapf(err, "failed to parse hostContainerSettingsSlice %s template", kind)
 	}
-	if _, err := tm.Parse(controlContainerTemplate); err != nil {
-		return nil, errors.Wrapf(err, "failed to parse controlContainer %s template", kind)
+	if _, err := tm.Parse(bootstrapContainerTemplate); err != nil {
+		return nil, errors.Wrapf(err, "failed to parse bootstrapContainerSettings %s template", kind)
+	}
+	if _, err := tm.Parse(bootstrapContainerSliceTemplate); err != nil {
+		return nil, errors.Wrapf(err, "failed to parse bootstrapContainerSettingsSlice %s template", kind)
 	}
 	if _, err := tm.Parse(kubernetesInitTemplate); err != nil {
 		return nil, errors.Wrapf(err, "failed to parse kubernetes %s template", kind)
@@ -142,19 +160,44 @@ func getBottlerocketNodeUserData(bootstrapContainerUserData []byte, users []boot
 	}
 	b64AdminContainerUserData := base64.StdEncoding.EncodeToString(adminContainerUserData)
 
-	bottlerocketInput := &BottlerocketSettingsInput{
-		BootstrapContainerUserData: b64BootstrapContainerUserData,
-		AdminContainerUserData:     b64AdminContainerUserData,
-		BootstrapContainerSource:   fmt.Sprintf("%s:%s", config.BottlerocketBootstrap.ImageRepository, config.BottlerocketBootstrap.ImageTag),
-		PauseContainerSource:       fmt.Sprintf("%s:%s", config.Pause.ImageRepository, config.Pause.ImageTag),
-		HTTPSProxyEndpoint:         config.ProxyConfiguration.HTTPSProxy,
-		RegistryMirrorEndpoint:     config.RegistryMirrorConfiguration.Endpoint,
-		NodeLabels:                 parseNodeLabels(getArgValue(config.KubeletExtraArgs, "node-labels")), // empty string if it does not exist
-		Taints:                     parseTaints(config.Taints),                                           //empty string if it does not exist
+	hostContainers := []bootstrapv1.BottlerocketHostContainer{
+		{
+			Name:         "admin",
+			Superpowered: true,
+			UserData:     b64AdminContainerUserData,
+		},
+		{
+			Name:            "kubeadm-bootstrap",
+			Superpowered:    true,
+			ImageRepository: config.BottlerocketBootstrap.ImageRepository,
+			ImageTag:        config.BottlerocketBootstrap.ImageTag,
+			UserData:        b64BootstrapContainerUserData,
+		},
 	}
 
 	if config.BottlerocketControl.ImageRepository != "" && config.BottlerocketControl.ImageTag != "" {
-		bottlerocketInput.ControlContainerSource = fmt.Sprintf("%s:%s", config.BottlerocketControl.ImageRepository, config.BottlerocketControl.ImageTag)
+		hostContainers = append(hostContainers, bootstrapv1.BottlerocketHostContainer{
+			Name:            "control",
+			Superpowered:    false,
+			ImageRepository: config.BottlerocketControl.ImageRepository,
+			ImageTag:        config.BottlerocketControl.ImageTag,
+		})
+	}
+
+	if len(config.BottlerocketCustomHostContainers) != 0 {
+		hostContainers = append(hostContainers, config.BottlerocketCustomHostContainers...)
+	}
+
+	bottlerocketInput := &BottlerocketSettingsInput{
+		BootstrapContainerSource: fmt.Sprintf("%s:%s", config.BottlerocketBootstrap.ImageRepository, config.BottlerocketBootstrap.ImageTag),
+		PauseContainerSource:     fmt.Sprintf("%s:%s", config.Pause.ImageRepository, config.Pause.ImageTag),
+		HTTPSProxyEndpoint:       config.ProxyConfiguration.HTTPSProxy,
+		RegistryMirrorEndpoint:   config.RegistryMirrorConfiguration.Endpoint,
+		NodeLabels:               parseNodeLabels(getArgValue(config.KubeletExtraArgs, "node-labels")), // empty string if it does not exist
+		Taints:                   parseTaints(config.Taints),                                           //empty string if it does not exist
+		ProviderId:               getArgValue(config.KubeletExtraArgs, "provider-id"),
+		HostContainers:           hostContainers,
+		BootstrapContainers:      config.BottlerocketCustomBootstrapContainers,
 	}
 
 	if len(config.ProxyConfiguration.NoProxy) > 0 {

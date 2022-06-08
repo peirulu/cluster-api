@@ -179,6 +179,16 @@ type ClusterConfiguration struct {
 	// +optional
 	RegistryMirror RegistryMirrorConfiguration `json:"registryMirror,omitempty"`
 
+	// BottlerocketHostContainers contains the information of any additional images
+	// that we will deploy as host containers in the CPIs
+	// +optional
+	BottlerocketHostContainers []BottlerocketHostContainer `json:"bottlerocketCustomHostContainers,omitempty"`
+
+	// BottlerocketCustomBootstrapContainers adds additional bootstrap containers for Bottlerocket.
+	// This is only for bottlerocket.
+	// +optional
+	BottlerocketCustomBootstrapContainers []BottlerocketBootstrapContainer `json:"bottlerocketCustomBootstrapContainers,omitempty"`
+
 	// etcd holds configuration for etcd.
 	// NB: This value defaults to a Local (stacked) etcd
 	// +optional
@@ -320,6 +330,66 @@ type BottlerocketControl struct {
 	ImageTag string `json:"imageTag,omitempty"`
 
 	// TODO: evaluate if we need also a ImageName based on user feedbacks
+}
+
+// BottlerocketHostContainer describes a host image for Bottlerocket
+type BottlerocketHostContainer struct {
+	// Name is the host container name that will be given to the container in BR's `apiserver`
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
+	// Superpowered indicates if the container will be superpowered
+	// +kubebuilder:validation:Required
+	Superpowered bool `json:"superpowered"`
+	// imageRepository sets the container registry to pull images from.
+	// if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=512
+	ImageRepository string `json:"imageRepository,omitempty"`
+
+	// imageTag allows to specify a tag for the image.
+	// In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	ImageTag string `json:"imageTag,omitempty"`
+	// UserData is the userdata that will be attached to the image.
+	// +optional
+	UserData string `json:"userData,omitempty"`
+}
+
+// BottlerocketBootstrapContainer holds the bootstrap container setting for Bottlerocket
+type BottlerocketBootstrapContainer struct {
+	// Name is the bootstrap container name that will be given to the container in BR's `apiserver`.
+	Name string `json:"name"`
+
+	// imageRepository sets the container registry to pull images from.
+	// if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=512
+	ImageRepository string `json:"imageRepository,omitempty"`
+
+	// imageTag allows to specify a tag for the image.
+	// In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	ImageTag string `json:"imageTag,omitempty"`
+
+	// Essential decides whether or not the container should fail the boot process.
+	// Bootstrap containers configured with essential = true will stop the boot process if they exit code is a non-zero value.
+	// Default is false.
+	// +optional
+	Essential bool `json:"essential"`
+
+	// Mode represents the bootstrap container mode.
+	// +kubebuilder:validation:Enum=always;off;once
+	Mode string `json:"mode"`
+
+	// UserData is the base64-encoded userdata.
+	// +optional
+	UserData string `json:"userData,omitempty"`
 }
 
 // ProxyConfiguration holds the settings for proxying bottlerocket services
@@ -743,6 +813,15 @@ type JoinConfiguration struct {
 	// +optional
 	RegistryMirror RegistryMirrorConfiguration `json:"registryMirror,omitempty"`
 
+	// BottlerocketCustomHostContainers contains the information of any additional images
+	// that we will deploy as host containers in the CPIs
+	// +optional
+	BottlerocketCustomHostContainers []BottlerocketHostContainer `json:"bottlerocketCustomHostContainers,omitempty"`
+
+	// BottlerocketCustomBootstrapContainers adds additional bootstrap containers for Bottlerocket.
+	// This is only for bottlerocket.
+	// +optional
+	BottlerocketCustomBootstrapContainers []BottlerocketBootstrapContainer `json:"bottlerocketCustomBootstrapContainers,omitempty"`
 	// nodeRegistration holds fields that relate to registering the new control-plane node to the cluster.
 	// When used in the context of control plane nodes, NodeRegistration should remain consistent
 	// across both InitConfiguration and JoinConfiguration

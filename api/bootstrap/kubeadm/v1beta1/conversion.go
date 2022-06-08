@@ -688,6 +688,44 @@ func Convert_v1beta2_BottlerocketControl_To_v1beta1_BottlerocketControl(in *boot
 	return nil
 }
 
+func Convert_v1beta1_BottlerocketHostContainer_To_v1beta2_BottlerocketHostContainer(in *BottlerocketHostContainer, out *bootstrapv1.BottlerocketHostContainer, _ apimachineryconversion.Scope) error {
+	out.Name = in.Name
+	out.Superpowered = in.Superpowered
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	out.UserData = in.UserData
+	return nil
+}
+
+func Convert_v1beta2_BottlerocketHostContainer_To_v1beta1_BottlerocketHostContainer(in *bootstrapv1.BottlerocketHostContainer, out *BottlerocketHostContainer, _ apimachineryconversion.Scope) error {
+	out.Name = in.Name
+	out.Superpowered = in.Superpowered
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	out.UserData = in.UserData
+	return nil
+}
+
+func Convert_v1beta1_BottlerocketBootstrapContainer_To_v1beta2_BottlerocketBootstrapContainer(in *BottlerocketBootstrapContainer, out *bootstrapv1.BottlerocketBootstrapContainer, _ apimachineryconversion.Scope) error {
+	out.Name = in.Name
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	out.Essential = in.Essential
+	out.Mode = in.Mode
+	out.UserData = in.UserData
+	return nil
+}
+
+func Convert_v1beta2_BottlerocketBootstrapContainer_To_v1beta1_BottlerocketBootstrapContainer(in *bootstrapv1.BottlerocketBootstrapContainer, out *BottlerocketBootstrapContainer, _ apimachineryconversion.Scope) error {
+	out.Name = in.Name
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	out.Essential = in.Essential
+	out.Mode = in.Mode
+	out.UserData = in.UserData
+	return nil
+}
+
 func Convert_v1beta1_Etcd_To_v1beta2_Etcd(in *Etcd, out *bootstrapv1.Etcd, s apimachineryconversion.Scope) error {
 	if in.Local != nil {
 		if err := Convert_v1beta1_LocalEtcd_To_v1beta2_LocalEtcd(in.Local, &out.Local, s); err != nil {

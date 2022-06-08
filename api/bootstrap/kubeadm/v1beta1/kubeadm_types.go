@@ -109,6 +109,16 @@ type ClusterConfiguration struct {
 	// +optional
 	BottlerocketControl BottlerocketControl `json:"bottlerocketControl,omitempty"`
 
+	// BottlerocketHostContainers contains the information of any additional images
+	// that we will deploy as host containers in the CPIs
+	// +optional
+	BottlerocketHostContainers []BottlerocketHostContainer `json:"bottlerocketCustomHostContainers,omitempty"`
+
+	// BottlerocketCustomBootstrapContainers adds additional bootstrap containers for Bottlerocket.
+	// This is only for bottlerocket.
+	// +optional
+	BottlerocketCustomBootstrapContainers []BottlerocketBootstrapContainer `json:"bottlerocketCustomBootstrapContainers,omitempty"`
+
 	// Proxy holds the https and no proxy information
 	// This is only for bottlerocket
 	// +optional
@@ -248,6 +258,44 @@ type BottlerocketBootstrap struct {
 type BottlerocketControl struct {
 	// ImageMeta allows to customize the image used for the BottlerocketControl component
 	ImageMeta `json:",inline"`
+}
+
+// BottlerocketHostContainer describes a host image for Bottlerocket
+type BottlerocketHostContainer struct {
+	// Name is the host container name that will be given to the container in BR's `apiserver`
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
+	// Superpowered indicates if the container will be superpowered
+	// +kubebuilder:validation:Required
+	Superpowered bool `json:"superpowered"`
+	// ImageMeta is the actual location of the container image
+	ImageMeta `json:"source"`
+	// UserData is the userdata that will be attached to the image.
+	// +optional
+	UserData string `json:"userData,omitempty"`
+}
+
+// BottlerocketBootstrapContainer holds the bootstrap container setting for Bottlerocket
+type BottlerocketBootstrapContainer struct {
+	// Name is the bootstrap container name that will be given to the container in BR's `apiserver`.
+	Name string `json:"name"`
+
+	// ImageMeta is the actual image used for Bottlerocket bootstrap.
+	ImageMeta `json:",inline"`
+
+	// Essential decides whether or not the container should fail the boot process.
+	// Bootstrap containers configured with essential = true will stop the boot process if they exit code is a non-zero value.
+	// Default is false.
+	// +optional
+	Essential bool `json:"essential"`
+
+	// Mode represents the bootstrap container mode.
+	// +kubebuilder:validation:Enum=always;off;once
+	Mode string `json:"mode"`
+
+	// UserData is the base64-encoded userdata.
+	// +optional
+	UserData string `json:"userData,omitempty"`
 }
 
 // ProxyConfiguration holds the settings for proxying bottlerocket services
@@ -629,6 +677,16 @@ type JoinConfiguration struct {
 	// This is only for bottlerocket
 	// +optional
 	BottlerocketControl BottlerocketControl `json:"bottlerocketControl,omitempty"`
+
+	// BottlerocketHostContainers contains the information of any additional images
+	// that we will deploy as host containers in the CPIs
+	// +optional
+	BottlerocketHostContainers []BottlerocketHostContainer `json:"bottlerocketCustomHostContainers,omitempty"`
+
+	// BottlerocketCustomBootstrapContainers adds additional bootstrap containers for Bottlerocket.
+	// This is only for bottlerocket.
+	// +optional
+	BottlerocketCustomBootstrapContainers []BottlerocketBootstrapContainer `json:"bottlerocketCustomBootstrapContainers,omitempty"`
 
 	// Proxy holds the https and no proxy information
 	// This is only for bottlerocket
