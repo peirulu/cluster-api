@@ -355,6 +355,11 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddConversionFunc((*BottlerocketAdmin)(nil), (*v1beta2.BottlerocketAdmin)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_BottlerocketAdmin_To_v1beta2_BottlerocketAdmin(a.(*BottlerocketAdmin), b.(*v1beta2.BottlerocketAdmin), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddConversionFunc((*BottlerocketBootstrapContainer)(nil), (*v1beta2.BottlerocketBootstrapContainer)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1beta1_BottlerocketBootstrapContainer_To_v1beta2_BottlerocketBootstrapContainer(a.(*BottlerocketBootstrapContainer), b.(*v1beta2.BottlerocketBootstrapContainer), scope)
 	}); err != nil {
@@ -487,6 +492,11 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddConversionFunc((*v1beta2.BootstrapToken)(nil), (*BootstrapToken)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1beta2_BootstrapToken_To_v1beta1_BootstrapToken(a.(*v1beta2.BootstrapToken), b.(*BootstrapToken), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*v1beta2.BottlerocketAdmin)(nil), (*BottlerocketAdmin)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta2_BottlerocketAdmin_To_v1beta1_BottlerocketAdmin(a.(*v1beta2.BottlerocketAdmin), b.(*BottlerocketAdmin), scope)
 	}); err != nil {
 		return err
 	}
@@ -722,6 +732,17 @@ func Convert_v1beta2_BootstrapTokenString_To_v1beta1_BootstrapTokenString(in *v1
 	return autoConvert_v1beta2_BootstrapTokenString_To_v1beta1_BootstrapTokenString(in, out, s)
 }
 
+func autoConvert_v1beta1_BottlerocketAdmin_To_v1beta2_BottlerocketAdmin(in *BottlerocketAdmin, out *v1beta2.BottlerocketAdmin, s conversion.Scope) error {
+	// WARNING: in.ImageMeta requires manual conversion: does not exist in peer-type
+	return nil
+}
+
+func autoConvert_v1beta2_BottlerocketAdmin_To_v1beta1_BottlerocketAdmin(in *v1beta2.BottlerocketAdmin, out *BottlerocketAdmin, s conversion.Scope) error {
+	// WARNING: in.ImageRepository requires manual conversion: does not exist in peer-type
+	// WARNING: in.ImageTag requires manual conversion: does not exist in peer-type
+	return nil
+}
+
 func autoConvert_v1beta1_BottlerocketBootstrap_To_v1beta2_BottlerocketBootstrap(in *BottlerocketBootstrap, out *v1beta2.BottlerocketBootstrap, s conversion.Scope) error {
 	// WARNING: in.ImageMeta requires manual conversion: does not exist in peer-type
 	return nil
@@ -788,6 +809,9 @@ func autoConvert_v1beta1_ClusterConfiguration_To_v1beta2_ClusterConfiguration(in
 	if err := Convert_v1beta1_BottlerocketBootstrap_To_v1beta2_BottlerocketBootstrap(&in.BottlerocketBootstrap, &out.BottlerocketBootstrap, s); err != nil {
 		return err
 	}
+	if err := Convert_v1beta1_BottlerocketAdmin_To_v1beta2_BottlerocketAdmin(&in.BottlerocketAdmin, &out.BottlerocketAdmin, s); err != nil {
+		return err
+	}
 	if err := Convert_v1beta1_BottlerocketControl_To_v1beta2_BottlerocketControl(&in.BottlerocketControl, &out.BottlerocketControl, s); err != nil {
 		return err
 	}
@@ -852,6 +876,9 @@ func autoConvert_v1beta2_ClusterConfiguration_To_v1beta1_ClusterConfiguration(in
 		return err
 	}
 	if err := Convert_v1beta2_BottlerocketBootstrap_To_v1beta1_BottlerocketBootstrap(&in.BottlerocketBootstrap, &out.BottlerocketBootstrap, s); err != nil {
+		return err
+	}
+	if err := Convert_v1beta2_BottlerocketAdmin_To_v1beta1_BottlerocketAdmin(&in.BottlerocketAdmin, &out.BottlerocketAdmin, s); err != nil {
 		return err
 	}
 	if err := Convert_v1beta2_BottlerocketControl_To_v1beta1_BottlerocketControl(&in.BottlerocketControl, &out.BottlerocketControl, s); err != nil {
@@ -1298,6 +1325,9 @@ func autoConvert_v1beta1_JoinConfiguration_To_v1beta2_JoinConfiguration(in *Join
 	if err := Convert_v1beta1_BottlerocketBootstrap_To_v1beta2_BottlerocketBootstrap(&in.BottlerocketBootstrap, &out.BottlerocketBootstrap, s); err != nil {
 		return err
 	}
+	if err := Convert_v1beta1_BottlerocketAdmin_To_v1beta2_BottlerocketAdmin(&in.BottlerocketAdmin, &out.BottlerocketAdmin, s); err != nil {
+		return err
+	}
 	if err := Convert_v1beta1_BottlerocketControl_To_v1beta2_BottlerocketControl(&in.BottlerocketControl, &out.BottlerocketControl, s); err != nil {
 		return err
 	}
@@ -1337,6 +1367,9 @@ func autoConvert_v1beta2_JoinConfiguration_To_v1beta1_JoinConfiguration(in *v1be
 		return err
 	}
 	if err := Convert_v1beta2_BottlerocketBootstrap_To_v1beta1_BottlerocketBootstrap(&in.BottlerocketBootstrap, &out.BottlerocketBootstrap, s); err != nil {
+		return err
+	}
+	if err := Convert_v1beta2_BottlerocketAdmin_To_v1beta1_BottlerocketAdmin(&in.BottlerocketAdmin, &out.BottlerocketAdmin, s); err != nil {
 		return err
 	}
 	if err := Convert_v1beta2_BottlerocketControl_To_v1beta1_BottlerocketControl(&in.BottlerocketControl, &out.BottlerocketControl, s); err != nil {

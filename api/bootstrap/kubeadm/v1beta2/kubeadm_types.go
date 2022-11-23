@@ -164,6 +164,11 @@ type ClusterConfiguration struct {
 	// +optional
 	BottlerocketBootstrap BottlerocketBootstrap `json:"bottlerocketBootstrap,omitempty"`
 
+	// BottlerocketAdmin holds the image source for admin container
+	// This is only for bottlerocket
+	// +optional
+	BottlerocketAdmin BottlerocketAdmin `json:"bottlerocketAdmin,omitempty"`
+
 	// BottlerocketControl holds the image source for control container
 	// This is only for bottlerocket
 	// +optional
@@ -390,6 +395,24 @@ type BottlerocketBootstrapContainer struct {
 	// UserData is the base64-encoded userdata.
 	// +optional
 	UserData string `json:"userData,omitempty"`
+}
+
+// BottlerocketAdmin holds the settings of admin container for bottlerocket nodes
+// This setting is ONLY for bottlerocket nodes.
+type BottlerocketAdmin struct {
+	// imageRepository sets the container registry to pull images from.
+	// if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=512
+	ImageRepository string `json:"imageRepository,omitempty"`
+
+	// imageTag allows to specify a tag for the image.
+	// In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	ImageTag string `json:"imageTag,omitempty"`
 }
 
 // ProxyConfiguration holds the settings for proxying bottlerocket services
@@ -797,6 +820,11 @@ type JoinConfiguration struct {
 	// This is only for bottlerocket
 	// +optional
 	BottlerocketBootstrap BottlerocketBootstrap `json:"bottlerocketBootstrap,omitempty"`
+
+	// BottlerocketAdmin holds the image source for admin container
+	// This is only for bottlerocket
+	// +optional
+	BottlerocketAdmin BottlerocketAdmin `json:"bottlerocketAdmin,omitempty"`
 
 	// BottlerocketControl holds the image source for control container
 	// This is only for bottlerocket

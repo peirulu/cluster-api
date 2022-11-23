@@ -25,6 +25,7 @@ const (
 type BottlerocketConfig struct {
 	Pause                                 bootstrapv1.Pause
 	BottlerocketBootstrap                 bootstrapv1.BottlerocketBootstrap
+	BottlerocketAdmin                     bootstrapv1.BottlerocketAdmin
 	BottlerocketControl                   bootstrapv1.BottlerocketControl
 	ProxyConfiguration                    bootstrapv1.ProxyConfiguration
 	RegistryMirrorConfiguration           bootstrapv1.RegistryMirrorConfiguration
@@ -162,9 +163,11 @@ func getBottlerocketNodeUserData(bootstrapContainerUserData []byte, users []boot
 
 	hostContainers := []bootstrapv1.BottlerocketHostContainer{
 		{
-			Name:         "admin",
-			Superpowered: true,
-			UserData:     b64AdminContainerUserData,
+			Name:            "admin",
+			Superpowered:    true,
+			ImageRepository: config.BottlerocketAdmin.ImageRepository,
+			ImageTag:        config.BottlerocketAdmin.ImageTag,
+			UserData:        b64AdminContainerUserData,
 		},
 		{
 			Name:            "kubeadm-bootstrap",

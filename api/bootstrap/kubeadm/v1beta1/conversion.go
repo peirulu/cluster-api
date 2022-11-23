@@ -726,6 +726,18 @@ func Convert_v1beta2_BottlerocketBootstrapContainer_To_v1beta1_BottlerocketBoots
 	return nil
 }
 
+func Convert_v1beta1_BottlerocketAdmin_To_v1beta2_BottlerocketAdmin(in *BottlerocketAdmin, out *bootstrapv1.BottlerocketAdmin, _ apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
+func Convert_v1beta2_BottlerocketAdmin_To_v1beta1_BottlerocketAdmin(in *bootstrapv1.BottlerocketAdmin, out *BottlerocketAdmin, _ apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
 func Convert_v1beta1_Etcd_To_v1beta2_Etcd(in *Etcd, out *bootstrapv1.Etcd, s apimachineryconversion.Scope) error {
 	if in.Local != nil {
 		if err := Convert_v1beta1_LocalEtcd_To_v1beta2_LocalEtcd(in.Local, &out.Local, s); err != nil {

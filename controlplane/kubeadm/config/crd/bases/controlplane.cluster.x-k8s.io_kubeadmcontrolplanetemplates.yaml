@@ -339,6 +339,22 @@ spec:
                                   may reject unrecognized values.
                                   More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
                                 type: string
+                              bottlerocketAdmin:
+                                description: |-
+                                  BottlerocketAdmin holds the image source for admin container
+                                  This is only for bottlerocket
+                                properties:
+                                  imageRepository:
+                                    description: |-
+                                      imageRepository sets the container registry to pull images from.
+                                      if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+                                    type: string
+                                  imageTag:
+                                    description: |-
+                                      imageTag allows to specify a tag for the image.
+                                      In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+                                    type: string
+                                type: object
                               bottlerocketBootstrap:
                                 description: |-
                                   BottlerocketBootstrap holds the image source for kubeadm bootstrap container
@@ -1848,6 +1864,22 @@ spec:
                                   may reject unrecognized values.
                                   More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
                                 type: string
+                              bottlerocketAdmin:
+                                description: |-
+                                  BottlerocketAdmin holds the image source for admin container
+                                  This is only for bottlerocket
+                                properties:
+                                  imageRepository:
+                                    description: |-
+                                      imageRepository sets the container registry to pull images from.
+                                      if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+                                    type: string
+                                  imageTag:
+                                    description: |-
+                                      imageTag allows to specify a tag for the image.
+                                      In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+                                    type: string
+                                type: object
                               bottlerocketBootstrap:
                                 description: |-
                                   BottlerocketBootstrap holds the image source for kubeadm bootstrap container
@@ -3150,6 +3182,26 @@ spec:
                                     minItems: 1
                                     type: array
                                     x-kubernetes-list-type: atomic
+                                type: object
+                              bottlerocketAdmin:
+                                description: |-
+                                  BottlerocketAdmin holds the image source for admin container
+                                  This is only for bottlerocket
+                                properties:
+                                  imageRepository:
+                                    description: |-
+                                      imageRepository sets the container registry to pull images from.
+                                      if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+                                    maxLength: 512
+                                    minLength: 1
+                                    type: string
+                                  imageTag:
+                                    description: |-
+                                      imageTag allows to specify a tag for the image.
+                                      In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+                                    maxLength: 256
+                                    minLength: 1
+                                    type: string
                                 type: object
                               bottlerocketBootstrap:
                                 description: |-
@@ -4866,6 +4918,26 @@ spec:
                               for the join command
                             minProperties: 1
                             properties:
+                              bottlerocketAdmin:
+                                description: |-
+                                  BottlerocketAdmin holds the image source for admin container
+                                  This is only for bottlerocket
+                                properties:
+                                  imageRepository:
+                                    description: |-
+                                      imageRepository sets the container registry to pull images from.
+                                      if not set, the ImageRepository defined in ClusterConfiguration will be used instead.
+                                    maxLength: 512
+                                    minLength: 1
+                                    type: string
+                                  imageTag:
+                                    description: |-
+                                      imageTag allows to specify a tag for the image.
+                                      In case this value is set, kubeadm does not change automatically the version of the above components during upgrades.
+                                    maxLength: 256
+                                    minLength: 1
+                                    type: string
+                                type: object
                               bottlerocketBootstrap:
                                 description: |-
                                   BottlerocketBootstrap holds the image source for kubeadm bootstrap container
