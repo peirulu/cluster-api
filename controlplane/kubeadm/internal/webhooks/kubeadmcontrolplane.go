@@ -125,6 +125,9 @@ func (webhook *KubeadmControlPlane) ValidateUpdate(_ context.Context, oldK, newK
 		{"metadata", "*"},
 		// spec.kubeadmConfigSpec.clusterConfiguration
 		{spec, kubeadmConfigSpec, clusterConfiguration, "bottlerocketBootstrap", "*"},
+		{spec, kubeadmConfigSpec, clusterConfiguration, "bottlerocketAdmin", "*"},
+		{spec, kubeadmConfigSpec, clusterConfiguration, "bottlerocketControl", "*"},
+		{spec, kubeadmConfigSpec, clusterConfiguration, "bottlerocketCustomBootstrapContainers"},
 		{spec, kubeadmConfigSpec, clusterConfiguration, "pause", "*"},
 		{spec, kubeadmConfigSpec, clusterConfiguration, "etcd"},
 		{spec, kubeadmConfigSpec, clusterConfiguration, "etcd", "*"},
@@ -157,6 +160,9 @@ func (webhook *KubeadmControlPlane) ValidateUpdate(_ context.Context, oldK, newK
 		{spec, kubeadmConfigSpec, initConfiguration, timeouts, "*"},
 		// spec.kubeadmConfigSpec.joinConfiguration
 		{spec, kubeadmConfigSpec, joinConfiguration, "bottlerocketBootstrap", "*"},
+		{spec, kubeadmConfigSpec, joinConfiguration, "bottlerocketAdmin", "*"},
+		{spec, kubeadmConfigSpec, joinConfiguration, "bottlerocketControl", "*"},
+		{spec, kubeadmConfigSpec, joinConfiguration, "bottlerocketCustomBootstrapContainers"},
 		{spec, kubeadmConfigSpec, joinConfiguration, "pause", "*"},
 		{spec, kubeadmConfigSpec, joinConfiguration, nodeRegistration},
 		{spec, kubeadmConfigSpec, joinConfiguration, nodeRegistration, "*"},
