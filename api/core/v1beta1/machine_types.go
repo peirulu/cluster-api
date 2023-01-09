@@ -51,8 +51,12 @@ const (
 	// Note: The value of this label may be a hash if the control plane name is longer than 63 characters.
 	MachineControlPlaneNameLabel = "cluster.x-k8s.io/control-plane-name"
 
-	//MachineEtcdClusterLabelName is the label set on machines or related objects that are part of an etcd cluster
+	// MachineEtcdClusterLabelName is the label set on machines or related objects that are part of an etcd cluster
 	MachineEtcdClusterLabelName = "cluster.x-k8s.io/etcd-cluster"
+
+	// MachineEtcdReadyLabelName is the label set on machines that have succesfully joined the etcd cluster.
+	MachineEtcdReadyLabelName = "cluster.x-k8s.io/etcd-ready"
+
 	// PreDrainDeleteHookAnnotationPrefix annotation specifies the prefix we
 	// search each annotation for during the pre-drain.delete lifecycle hook
 	// to pause reconciliation of deletion. These hooks will prevent removal of

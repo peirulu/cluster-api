@@ -921,7 +921,7 @@ func setMachinePhaseAndLastUpdated(_ context.Context, m *clusterv1.Machine) {
 
 	if _, ok := m.Labels[clusterv1.MachineEtcdClusterLabelName]; ok {
 		// Status.NodeRef does not get set for etcd machines since they don't correspond to k8s node objects
-		if ptr.Deref(m.Status.Initialization.InfrastructureProvisioned, false) {
+		if _, ok := m.Labels[clusterv1.MachineEtcdReadyLabelName]; ok && ptr.Deref(m.Status.Initialization.InfrastructureProvisioned, false) {
 			m.Status.SetTypedPhase(clusterv1.MachinePhaseRunning)
 		}
 	}
