@@ -22,11 +22,13 @@ const (
 `
 )
 
+// BottlerocketConfig is the Bottlerocket configuration for a machine.
 type BottlerocketConfig struct {
 	Pause                                 bootstrapv1.Pause
 	BottlerocketBootstrap                 bootstrapv1.BottlerocketBootstrap
 	BottlerocketAdmin                     bootstrapv1.BottlerocketAdmin
 	BottlerocketControl                   bootstrapv1.BottlerocketControl
+	BottlerocketSettings                  *bootstrapv1.BottlerocketSettings
 	ProxyConfiguration                    bootstrapv1.ProxyConfiguration
 	RegistryMirrorConfiguration           bootstrapv1.RegistryMirrorConfiguration
 	KubeletExtraArgs                      []bootstrapv1.Arg
@@ -34,9 +36,11 @@ type BottlerocketConfig struct {
 	BottlerocketCustomHostContainers      []bootstrapv1.BottlerocketHostContainer
 	BottlerocketCustomBootstrapContainers []bootstrapv1.BottlerocketBootstrapContainer
 	NTPServers                            []string
+	Hostname                              string
 	RegistryMirrorCredentials
 }
 
+// BottlerocketSettingsInput is the input for the Bottlerocket settings template.
 type BottlerocketSettingsInput struct {
 	BootstrapContainerUserData string
 	AdminContainerUserData     string
@@ -52,16 +56,22 @@ type BottlerocketSettingsInput struct {
 	NodeLabels                 string
 	NTPServers                 []string
 	Taints                     string
-	ProviderId                 string
+	ProviderID                 string
+	Hostname                   string
+	AllowedUnsafeSysctls       []string
+	ClusterDNSIPs              []string
+	MaxPods                    int
 	HostContainers             []bootstrapv1.BottlerocketHostContainer
 	BootstrapContainers        []bootstrapv1.BottlerocketBootstrapContainer
 }
 
+// HostPath holds the path and type of a host path volume.
 type HostPath struct {
 	Path string
 	Type string
 }
 
+// RegistryMirrorCredentials holds registry mirror credentials to be configured on bottlerocket nodes.
 type RegistryMirrorCredentials struct {
 	Username string
 	Password string
@@ -214,7 +224,8 @@ func getBottlerocketNodeUserData(bootstrapContainerUserData []byte, users []boot
 		RegistryMirrorEndpoint:   config.RegistryMirrorConfiguration.Endpoint,
 		NodeLabels:               parseNodeLabels(getArgValue(config.KubeletExtraArgs, "node-labels")), // empty string if it does not exist
 		Taints:                   parseTaints(config.Taints),                                           //empty string if it does not exist
-		ProviderId:               getArgValue(config.KubeletExtraArgs, "provider-id"),
+		ProviderID:               getArgValue(config.KubeletExtraArgs, "provider-id"),
+		Hostname:                 config.Hostname,
 		HostContainers:           hostContainers,
 		BootstrapContainers:      config.BottlerocketCustomBootstrapContainers,
 	}
@@ -236,12 +247,17 @@ func getBottlerocketNodeUserData(bootstrapContainerUserData []byte, users []boot
 			bottlerocketInput.NTPServers = append(bottlerocketInput.NTPServers, strconv.Quote(ntp))
 		}
 	}
-
-	bottlerocketNodeUserData, err := generateNodeUserData("InitBottlerocketNode", bottlerocketNodeInitSettingsTemplate, bottlerocketInput)
-	if err != nil {
-		return nil, err
+	if config.BottlerocketSettings != nil && config.BottlerocketSettings.Kubernetes != nil {
+		bottlerocketInput.MaxPods = config.BottlerocketSettings.Kubernetes.MaxPods
+		for _, sysctl := range config.BottlerocketSettings.Kubernetes.AllowedUnsafeSysctls {
+			bottlerocketInput.AllowedUnsafeSysctls = append(bottlerocketInput.AllowedUnsafeSysctls, strconv.Quote(sysctl))
+		}
+		for _, ip := range config.BottlerocketSettings.Kubernetes.ClusterDNSIPs {
+			bottlerocketInput.ClusterDNSIPs = append(bottlerocketInput.ClusterDNSIPs, strconv.Quote(ip))
+		}
 	}
-	return bottlerocketNodeUserData, nil
+
+	return generateNodeUserData("InitBottlerocketNode", bottlerocketNodeInitSettingsTemplate, bottlerocketInput)
 }
 
 // getArgValue searches for an argument by name in the slice and returns its value.

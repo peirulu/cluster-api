@@ -10,8 +10,17 @@ standalone-mode = true
 authentication-mode = "tls"
 server-tls-bootstrap = false
 pod-infra-container-image = "{{.PauseContainerSource}}"
-{{- if (ne .ProviderId "")}}
-provider-id = "{{.ProviderId}}"
+{{- if (ne .ProviderID "")}}
+provider-id = "{{.ProviderID}}"
+{{- end -}}
+{{- if .AllowedUnsafeSysctls }}
+allowed-unsafe-sysctls = [{{stringsJoin .AllowedUnsafeSysctls ", " }}]
+{{- end -}}
+{{- if .ClusterDNSIPs }}
+cluster-dns-ip = [{{stringsJoin .ClusterDNSIPs ", " }}]
+{{- end -}}
+{{- if .MaxPods }}
+max-pods = {{.MaxPods}}
 {{- end -}}
 {{- end -}}
 `
@@ -55,11 +64,13 @@ user-data = "{{.UserData}}"
 {{- end -}}
 {{- end -}}
 `
-
 	networkInitTemplate = `{{ define "networkInitSettings" -}}
 [settings.network]
+hostname = "{{.Hostname}}"
+{{- if (ne .HTTPSProxyEndpoint "")}}
 https-proxy = "{{.HTTPSProxyEndpoint}}"
 no-proxy = [{{stringsJoin .NoProxyEndpoints "," }}]
+{{- end -}}
 {{- end -}}
 `
 	registryMirrorTemplate = `{{ define "registryMirrorSettings" -}}
@@ -108,13 +119,12 @@ time-servers = [{{stringsJoin .NTPServers ", " }}]
 
 {{template "kubernetesInitSettings" .}}
 
+{{template "networkInitSettings" .}}
+
 {{- if .BootstrapContainers}}
 {{template "bootstrapContainerSlice" .}}
 {{- end -}}
 
-{{- if (ne .HTTPSProxyEndpoint "")}}
-{{template "networkInitSettings" .}}
-{{- end -}}
 
 {{- if (ne .RegistryMirrorEndpoint "")}}
 {{template "registryMirrorSettings" .}}

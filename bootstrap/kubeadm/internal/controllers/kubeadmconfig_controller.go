@@ -555,6 +555,8 @@ func (r *KubeadmConfigReconciler) handleClusterNotInitialized(ctx context.Contex
 			BottlerocketControl:                   scope.Config.Spec.ClusterConfiguration.BottlerocketControl,
 			BottlerocketCustomHostContainers:      scope.Config.Spec.ClusterConfiguration.BottlerocketHostContainers,
 			BottlerocketCustomBootstrapContainers: scope.Config.Spec.ClusterConfiguration.BottlerocketCustomBootstrapContainers,
+			BottlerocketSettings:                  scope.Config.Spec.ClusterConfiguration.Bottlerocket,
+			Hostname:                              machine.Name,
 		}
 		if scope.Config.Spec.ClusterConfiguration.Proxy.HTTPSProxy != "" {
 			bottlerocketConfig.ProxyConfiguration = scope.Config.Spec.ClusterConfiguration.Proxy
@@ -759,6 +761,11 @@ func (r *KubeadmConfigReconciler) joinWorker(ctx context.Context, scope *Scope) 
 		return res, nil
 	}
 
+	machine := &clusterv1.Machine{}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(scope.ConfigOwner.Object, machine); err != nil {
+		return ctrl.Result{}, errors.Wrapf(err, "cannot convert %s to Machine", scope.ConfigOwner.GetKind())
+	}
+
 	kubernetesVersion := scope.ConfigOwner.KubernetesVersion()
 	parsedVersion, err := semver.ParseTolerant(kubernetesVersion)
 	if err != nil {
@@ -871,6 +878,8 @@ func (r *KubeadmConfigReconciler) joinWorker(ctx context.Context, scope *Scope) 
 			BottlerocketControl:                   scope.Config.Spec.JoinConfiguration.BottlerocketControl,
 			BottlerocketCustomHostContainers:      scope.Config.Spec.JoinConfiguration.BottlerocketCustomHostContainers,
 			BottlerocketCustomBootstrapContainers: scope.Config.Spec.JoinConfiguration.BottlerocketCustomBootstrapContainers,
+			BottlerocketSettings:                  scope.Config.Spec.JoinConfiguration.Bottlerocket,
+			Hostname:                              machine.Name,
 		}
 		if scope.Config.Spec.JoinConfiguration.Proxy.HTTPSProxy != "" {
 			bottlerocketConfig.ProxyConfiguration = scope.Config.Spec.JoinConfiguration.Proxy
@@ -926,6 +935,11 @@ func (r *KubeadmConfigReconciler) joinControlplane(ctx context.Context, scope *S
 
 	if scope.Config.Spec.JoinConfiguration.ControlPlane == nil {
 		scope.Config.Spec.JoinConfiguration.ControlPlane = &bootstrapv1.JoinControlPlane{}
+	}
+
+	machine := &clusterv1.Machine{}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(scope.ConfigOwner.Object, machine); err != nil {
+		return ctrl.Result{}, errors.Wrapf(err, "cannot convert %s to Machine", scope.ConfigOwner.GetKind())
 	}
 
 	certificates := secret.NewControlPlaneJoinCerts(&scope.Config.Spec.ClusterConfiguration)
@@ -1068,6 +1082,8 @@ func (r *KubeadmConfigReconciler) joinControlplane(ctx context.Context, scope *S
 			BottlerocketControl:                   scope.Config.Spec.JoinConfiguration.BottlerocketControl,
 			BottlerocketCustomHostContainers:      scope.Config.Spec.JoinConfiguration.BottlerocketCustomHostContainers,
 			BottlerocketCustomBootstrapContainers: scope.Config.Spec.JoinConfiguration.BottlerocketCustomBootstrapContainers,
+			BottlerocketSettings:                  scope.Config.Spec.JoinConfiguration.Bottlerocket,
+			Hostname:                              machine.Name,
 		}
 		if scope.Config.Spec.JoinConfiguration.Proxy.HTTPSProxy != "" {
 			bottlerocketConfig.ProxyConfiguration = scope.Config.Spec.JoinConfiguration.Proxy

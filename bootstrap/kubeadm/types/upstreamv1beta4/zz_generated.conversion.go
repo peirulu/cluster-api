@@ -511,6 +511,7 @@ func autoConvert_v1beta2_ClusterConfiguration_To_upstreamv1beta4_ClusterConfigur
 	// WARNING: in.RegistryMirror requires manual conversion: does not exist in peer-type
 	// WARNING: in.BottlerocketHostContainers requires manual conversion: does not exist in peer-type
 	// WARNING: in.BottlerocketCustomBootstrapContainers requires manual conversion: does not exist in peer-type
+	// WARNING: in.Bottlerocket requires manual conversion: does not exist in peer-type
 	if err := Convert_v1beta2_Etcd_To_upstreamv1beta4_Etcd(&in.Etcd, &out.Etcd, s); err != nil {
 		return err
 	}
@@ -771,6 +772,7 @@ func autoConvert_v1beta2_JoinConfiguration_To_upstreamv1beta4_JoinConfiguration(
 	// WARNING: in.RegistryMirror requires manual conversion: does not exist in peer-type
 	// WARNING: in.BottlerocketCustomHostContainers requires manual conversion: does not exist in peer-type
 	// WARNING: in.BottlerocketCustomBootstrapContainers requires manual conversion: does not exist in peer-type
+	// WARNING: in.Bottlerocket requires manual conversion: does not exist in peer-type
 	if err := Convert_v1beta2_NodeRegistrationOptions_To_upstreamv1beta4_NodeRegistrationOptions(&in.NodeRegistration, &out.NodeRegistration, s); err != nil {
 		return err
 	}

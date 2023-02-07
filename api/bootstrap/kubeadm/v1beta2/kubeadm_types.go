@@ -194,6 +194,11 @@ type ClusterConfiguration struct {
 	// +optional
 	BottlerocketCustomBootstrapContainers []BottlerocketBootstrapContainer `json:"bottlerocketCustomBootstrapContainers,omitempty"`
 
+	// Bottlerocket holds configuration for certain bottlerocket settings.
+	// This is only for bottlerocket.
+	// +optional
+	Bottlerocket *BottlerocketSettings `json:"bottlerocket,omitempty"`
+
 	// etcd holds configuration for etcd.
 	// NB: This value defaults to a Local (stacked) etcd
 	// +optional
@@ -395,6 +400,26 @@ type BottlerocketBootstrapContainer struct {
 	// UserData is the base64-encoded userdata.
 	// +optional
 	UserData string `json:"userData,omitempty"`
+}
+
+// BottlerocketSettings define bottlerocket settings that can be configured on bottlerocket nodes.
+// This setting is ONLY for bottlerocket nodes.
+type BottlerocketSettings struct {
+	// Kubernetes holds the kubernetes settings for bottlerocket nodes.
+	Kubernetes *BottlerocketKubernetesSettings `json:"kubernetes,omitempty"`
+}
+
+// BottlerocketKubernetesSettings holds the settings for kubernetes on bottlerocket nodes.
+// This setting is ONLY for bottlerocket nodes.
+type BottlerocketKubernetesSettings struct {
+	// MaxPods defines the maximum number of pods that can run on a node.
+	MaxPods int `json:"maxPods,omitempty"`
+
+	// AllowedUnsafeSysctls defines the list of unsafe sysctls that can be set on a node.
+	AllowedUnsafeSysctls []string `json:"allowedUnsafeSysctls,omitempty"`
+
+	// ClusterDNSIPs defines IP addresses of the DNS servers.
+	ClusterDNSIPs []string `json:"clusterDNSIPs,omitempty"`
 }
 
 // BottlerocketAdmin holds the settings of admin container for bottlerocket nodes
@@ -850,6 +875,12 @@ type JoinConfiguration struct {
 	// This is only for bottlerocket.
 	// +optional
 	BottlerocketCustomBootstrapContainers []BottlerocketBootstrapContainer `json:"bottlerocketCustomBootstrapContainers,omitempty"`
+
+	// Bottlerocket holds configuration for certain bottlerocket settings.
+	// This is only for bottlerocket.
+	// +optional
+	Bottlerocket *BottlerocketSettings `json:"bottlerocket,omitempty"`
+
 	// nodeRegistration holds fields that relate to registering the new control-plane node to the cluster.
 	// When used in the context of control plane nodes, NodeRegistration should remain consistent
 	// across both InitConfiguration and JoinConfiguration
