@@ -282,6 +282,12 @@ type ClusterConfiguration struct {
 	EncryptionAlgorithm EncryptionAlgorithmType `json:"encryptionAlgorithm,omitempty"`
 }
 
+// BottlerocketKernelSettings holds the kernel settings for bottlerocket nodes
+type BottlerocketKernelSettings struct {
+	// SysctlSettings defines the kernel sysctl settings to set for bottlerocket nodes.
+	SysctlSettings map[string]string `json:"sysctlSettings,omitempty"`
+}
+
 // Pause defines the pause image repo and tag that should be run on the bootstrapped nodes.
 // This setting is ONLY for bottlerocket nodes, as this needs to be set pre-boot time along with user-data
 type Pause struct {
@@ -407,6 +413,10 @@ type BottlerocketBootstrapContainer struct {
 type BottlerocketSettings struct {
 	// Kubernetes holds the kubernetes settings for bottlerocket nodes.
 	Kubernetes *BottlerocketKubernetesSettings `json:"kubernetes,omitempty"`
+
+	// KernelSettings contains additional kernel settings for Bottlerocket.
+	// +optional
+	Kernel *BottlerocketKernelSettings `json:"kernel,omitempty"`
 }
 
 // BottlerocketKubernetesSettings holds the settings for kubernetes on bottlerocket nodes.
