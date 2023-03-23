@@ -288,6 +288,11 @@ type BottlerocketKernelSettings struct {
 	SysctlSettings map[string]string `json:"sysctlSettings,omitempty"`
 }
 
+// BottlerocketBootSettings holds the boot-related settings for bottlerocket nodes.
+type BottlerocketBootSettings struct {
+	BootKernelParameters map[string][]string `json:"bootKernelParameters,omitempty"`
+}
+
 // Pause defines the pause image repo and tag that should be run on the bootstrapped nodes.
 // This setting is ONLY for bottlerocket nodes, as this needs to be set pre-boot time along with user-data
 type Pause struct {
@@ -417,6 +422,9 @@ type BottlerocketSettings struct {
 	// KernelSettings contains additional kernel settings for Bottlerocket.
 	// +optional
 	Kernel *BottlerocketKernelSettings `json:"kernel,omitempty"`
+
+	// Boot holds the boot-related settings for bottlerocket nodes
+	Boot *BottlerocketBootSettings `json:"boot,omitempty"`
 }
 
 // BottlerocketKubernetesSettings holds the settings for kubernetes on bottlerocket nodes.

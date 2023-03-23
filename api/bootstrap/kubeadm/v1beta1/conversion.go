@@ -738,6 +738,25 @@ func Convert_v1beta2_BottlerocketAdmin_To_v1beta1_BottlerocketAdmin(in *bootstra
 	return nil
 }
 
+func Convert_v1beta2_BottlerocketSettings_To_v1beta1_BottlerocketSettings(in *bootstrapv1.BottlerocketSettings, out *BottlerocketSettings, _ apimachineryconversion.Scope) error {
+	// Copy the Kubernetes field
+	if in.Kubernetes != nil {
+		out.Kubernetes = &BottlerocketKubernetesSettings{
+			MaxPods:              in.Kubernetes.MaxPods,
+			AllowedUnsafeSysctls: in.Kubernetes.AllowedUnsafeSysctls,
+			ClusterDNSIPs:        in.Kubernetes.ClusterDNSIPs,
+		}
+	}
+	// Copy the Kernel field if it exists in v1beta1
+	if in.Kernel != nil {
+		out.Kernel = &BottlerocketKernelSettings{
+			SysctlSettings: in.Kernel.SysctlSettings,
+		}
+	}
+	// Note: v1beta2 has additional Boot field that doesn't exist in v1beta1, so it's lost during conversion
+	return nil
+}
+
 func Convert_v1beta1_Etcd_To_v1beta2_Etcd(in *Etcd, out *bootstrapv1.Etcd, s apimachineryconversion.Scope) error {
 	if in.Local != nil {
 		if err := Convert_v1beta1_LocalEtcd_To_v1beta2_LocalEtcd(in.Local, &out.Local, s); err != nil {

@@ -320,6 +320,10 @@ type BottlerocketBootstrapContainer struct {
 type BottlerocketSettings struct {
 	// Kubernetes holds the kubernetes settings for bottlerocket nodes.
 	Kubernetes *BottlerocketKubernetesSettings `json:"kubernetes,omitempty"`
+
+	// KernelSettings contains additional kernel settings for Bottlerocket.
+	// +optional
+	Kernel *BottlerocketKernelSettings `json:"kernel,omitempty"`
 }
 
 // BottlerocketKubernetesSettings holds the settings for kubernetes on bottlerocket nodes.
@@ -333,6 +337,12 @@ type BottlerocketKubernetesSettings struct {
 
 	// ClusterDNSIPs defines IP addresses of the DNS servers.
 	ClusterDNSIPs []string `json:"clusterDNSIPs,omitempty"`
+}
+
+// BottlerocketKernelSettings holds the kernel settings for bottlerocket nodes
+type BottlerocketKernelSettings struct {
+	// SysctlSettings defines the kernel sysctl settings to set for bottlerocket nodes.
+	SysctlSettings map[string]string `json:"sysctlSettings,omitempty"`
 }
 
 // ProxyConfiguration holds the settings for proxying bottlerocket services
