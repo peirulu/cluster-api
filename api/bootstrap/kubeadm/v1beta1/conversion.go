@@ -753,7 +753,12 @@ func Convert_v1beta2_BottlerocketSettings_To_v1beta1_BottlerocketSettings(in *bo
 			SysctlSettings: in.Kernel.SysctlSettings,
 		}
 	}
-	// Note: v1beta2 has additional Boot field that doesn't exist in v1beta1, so it's lost during conversion
+	// Copy the Boot field
+	if in.Boot != nil {
+		out.Boot = &BottlerocketBootSettings{
+			BootKernelParameters: in.Boot.BootKernelParameters,
+		}
+	}
 	return nil
 }
 
@@ -1028,6 +1033,30 @@ func Convert_v1beta2_User_To_v1beta1_User(in *bootstrapv1.User, out *User, s api
 		out.PasswdFrom = &PasswdSource{}
 		if err := Convert_v1beta2_PasswdSource_To_v1beta1_PasswdSource(&in.PasswdFrom, out.PasswdFrom, s); err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func Convert_v1beta1_BottlerocketSettings_To_v1beta2_BottlerocketSettings(in *BottlerocketSettings, out *bootstrapv1.BottlerocketSettings, _ apimachineryconversion.Scope) error {
+	// Copy the Kubernetes field
+	if in.Kubernetes != nil {
+		out.Kubernetes = &bootstrapv1.BottlerocketKubernetesSettings{
+			MaxPods:              in.Kubernetes.MaxPods,
+			AllowedUnsafeSysctls: in.Kubernetes.AllowedUnsafeSysctls,
+			ClusterDNSIPs:        in.Kubernetes.ClusterDNSIPs,
+		}
+	}
+	// Copy the Kernel field
+	if in.Kernel != nil {
+		out.Kernel = &bootstrapv1.BottlerocketKernelSettings{
+			SysctlSettings: in.Kernel.SysctlSettings,
+		}
+	}
+	// Copy the Boot field
+	if in.Boot != nil {
+		out.Boot = &bootstrapv1.BottlerocketBootSettings{
+			BootKernelParameters: in.Boot.BootKernelParameters,
 		}
 	}
 	return nil

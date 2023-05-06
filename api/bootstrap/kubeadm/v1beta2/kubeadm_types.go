@@ -199,6 +199,10 @@ type ClusterConfiguration struct {
 	// +optional
 	Bottlerocket *BottlerocketSettings `json:"bottlerocket,omitempty"`
 
+	// CertBundles holds additional trusted cert bundles.
+	// +optional
+	CertBundles []CertBundle `json:"certBundles,omitempty"`
+
 	// etcd holds configuration for etcd.
 	// NB: This value defaults to a Local (stacked) etcd
 	// +optional
@@ -899,6 +903,10 @@ type JoinConfiguration struct {
 	// +optional
 	Bottlerocket *BottlerocketSettings `json:"bottlerocket,omitempty"`
 
+	// CertBundles holds additional trusted cert bundles.
+	// +optional
+	CertBundles []CertBundle `json:"certBundles,omitempty"`
+
 	// nodeRegistration holds fields that relate to registering the new control-plane node to the cluster.
 	// When used in the context of control plane nodes, NodeRegistration should remain consistent
 	// across both InitConfiguration and JoinConfiguration
@@ -948,6 +956,15 @@ type JoinConfiguration struct {
 // IsDefined returns true if the JoinConfiguration is defined.
 func (r *JoinConfiguration) IsDefined() bool {
 	return !reflect.DeepEqual(r, &JoinConfiguration{})
+}
+
+// CertBundle holds the cert data.
+type CertBundle struct {
+	// Name is the name of the cert bundle.
+	Name string `json:"name"`
+
+	// Data is the actual cert.
+	Data string `json:"data"`
 }
 
 // JoinControlPlane contains elements describing an additional control plane instance to be deployed on the joining node.

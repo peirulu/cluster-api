@@ -129,6 +129,10 @@ type ClusterConfiguration struct {
 	// +optional
 	Bottlerocket *BottlerocketSettings `json:"bottlerocket,omitempty"`
 
+	// CertBundles holds additional trusted cert bundles.
+	// +optional
+	CertBundles []CertBundle `json:"certBundles,omitempty"`
+
 	// Proxy holds the https and no proxy information
 	// This is only for bottlerocket
 	// +optional
@@ -315,6 +319,15 @@ type BottlerocketBootstrapContainer struct {
 	UserData string `json:"userData,omitempty"`
 }
 
+// CertBundle holds the cert data.
+type CertBundle struct {
+	// Name is the name of the cert bundle.
+	Name string `json:"name"`
+
+	// Data is the actual cert.
+	Data string `json:"data"`
+}
+
 // BottlerocketSettings define bottlerocket settings that can be configured on bottlerocket nodes.
 // This setting is ONLY for bottlerocket nodes.
 type BottlerocketSettings struct {
@@ -324,6 +337,9 @@ type BottlerocketSettings struct {
 	// KernelSettings contains additional kernel settings for Bottlerocket.
 	// +optional
 	Kernel *BottlerocketKernelSettings `json:"kernel,omitempty"`
+
+	// Boot holds the boot-related settings for bottlerocket nodes
+	Boot *BottlerocketBootSettings `json:"boot,omitempty"`
 }
 
 // BottlerocketKubernetesSettings holds the settings for kubernetes on bottlerocket nodes.
@@ -343,6 +359,11 @@ type BottlerocketKubernetesSettings struct {
 type BottlerocketKernelSettings struct {
 	// SysctlSettings defines the kernel sysctl settings to set for bottlerocket nodes.
 	SysctlSettings map[string]string `json:"sysctlSettings,omitempty"`
+}
+
+// BottlerocketBootSettings holds the boot-related settings for bottlerocket nodes.
+type BottlerocketBootSettings struct {
+	BootKernelParameters map[string][]string `json:"bootKernelParameters,omitempty"`
 }
 
 // ProxyConfiguration holds the settings for proxying bottlerocket services
@@ -744,6 +765,10 @@ type JoinConfiguration struct {
 	// This is only for bottlerocket.
 	// +optional
 	Bottlerocket *BottlerocketSettings `json:"bottlerocket,omitempty"`
+
+	// CertBundles holds additional trusted cert bundles.
+	// +optional
+	CertBundles []CertBundle `json:"certBundles,omitempty"`
 
 	// Proxy holds the https and no proxy information
 	// This is only for bottlerocket
