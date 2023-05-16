@@ -43,9 +43,11 @@ import (
 	secretutil "sigs.k8s.io/cluster-api/util/secret"
 )
 
-const clusterTopologyNameKey = "cluster.spec.topology.class"
-const clusterTopologyNamespaceKey = "cluster.spec.topology.classNamespace"
-const clusterResourceSetBindingClusterNameKey = "clusterresourcesetbinding.spec.clustername"
+const (
+	clusterTopologyNameKey                  = "cluster.spec.topology.class"
+	clusterTopologyNamespaceKey             = "cluster.spec.topology.classNamespace"
+	clusterResourceSetBindingClusterNameKey = "clusterresourcesetbinding.spec.clustername"
+)
 
 type empty struct{}
 
@@ -428,8 +430,8 @@ func getCRDList(ctx context.Context, proxy Proxy, crdList *apiextensionsv1.Custo
 }
 
 // Discovery reads all the Kubernetes objects existing in a namespace (or in all namespaces if empty) for the types received in input, and then adds
-// everything to the objects graph.
-func (o *objectGraph) Discovery(ctx context.Context, namespace string) error {
+// everything to the objects graph. Filters for objects only belonging to specific cluster if provided.
+func (o *objectGraph) Discovery(ctx context.Context, namespace, clusterName string) error {
 	log := logf.Log
 	log.Info("Discovering Cluster API objects")
 
@@ -559,8 +561,44 @@ func (o *objectGraph) Discovery(ctx context.Context, namespace string) error {
 	// Completes the graph by setting for each node the list of tenants the node belongs to.
 	o.setTenants()
 
+	// Filter and remove nodes in the graph that do not belong to cluster
+	if clusterName != "" {
+		return o.filterCluster(clusterName)
+	}
+
 	// Ensure objects which are referenced across namespaces are not deleted.
 	return o.setShouldNotDelete(ctx, namespace)
+}
+
+// filterCluster removes all objects but provided cluster and its dependents and soft-dependents
+func (o *objectGraph) filterCluster(clusterName string) error {
+	for _, object := range o.getNodes() {
+
+		hasFilterCluster := false
+		var clusterTenants []string
+		for tenant := range object.tenant {
+			if tenant.identity.GroupVersionKind().GroupKind() == clusterv1.GroupVersion.WithKind("Cluster").GroupKind() {
+				clusterTenants = append(clusterTenants, tenant.identity.Name)
+				if tenant.identity.Name == clusterName {
+					hasFilterCluster = true
+				}
+			}
+		}
+
+		// Return error only when node has more than 1 cluster tenant and one of those cluster tenant is the clusterName
+		// being filtered for. This is to prevent moving an object that more than one cluster is dependent on.
+		if hasFilterCluster && len(clusterTenants) > 1 {
+			return fmt.Errorf("resource %s is a dependent of clusters %s. Only one cluster dependent allowed",
+				object.identity.Name, strings.Join(clusterTenants, ","))
+		}
+
+		if !hasFilterCluster {
+			if _, ok := o.uidToNode[object.identity.UID]; ok {
+				delete(o.uidToNode, object.identity.UID)
+			}
+		}
+	}
+	return nil
 }
 
 // fetchRef collects specified reference and adds to moved objects.

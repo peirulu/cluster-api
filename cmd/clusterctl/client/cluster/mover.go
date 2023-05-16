@@ -53,13 +53,16 @@ type ResourceMutatorFunc func(u *unstructured.Unstructured) error
 // ObjectMover defines methods for moving Cluster API objects to another management cluster.
 type ObjectMover interface {
 	// Move moves all the Cluster API objects existing in a namespace (or from all the namespaces if empty) to a target management cluster.
-	Move(ctx context.Context, namespace string, toCluster Client, dryRun bool, mutators ...ResourceMutatorFunc) error
+	// If `clusterName` is specified (not empty string), only objects belonging to the cluster will be moved.
+	Move(ctx context.Context, namespace string, toCluster Client, clusterName string, dryRun bool, mutators ...ResourceMutatorFunc) error
 
 	// ToDirectory writes all the Cluster API objects existing in a namespace (or from all the namespaces if empty) to a target directory.
-	ToDirectory(ctx context.Context, namespace string, directory string) error
+	// If `clusterName` is specified (not empty string), only objects belonging to the cluster will be moved.
+	ToDirectory(ctx context.Context, namespace string, directory, clusterName string) error
 
 	// FromDirectory reads all the Cluster API objects existing in a configured directory to a target management cluster.
-	FromDirectory(ctx context.Context, toCluster Client, directory string) error
+	// If `clusterName` is specified (not empty string), only objects belonging to the cluster will be moved.
+	FromDirectory(ctx context.Context, toCluster Client, directory, clusterName string) error
 }
 
 // objectMover implements the ObjectMover interface.
@@ -72,7 +75,7 @@ type objectMover struct {
 // ensure objectMover implements the ObjectMover interface.
 var _ ObjectMover = &objectMover{}
 
-func (o *objectMover) Move(ctx context.Context, namespace string, toCluster Client, dryRun bool, mutators ...ResourceMutatorFunc) error {
+func (o *objectMover) Move(ctx context.Context, namespace string, toCluster Client, clusterName string, dryRun bool, mutators ...ResourceMutatorFunc) error {
 	log := logf.Log
 	log.Info("Performing move...")
 	o.dryRun = dryRun
@@ -89,7 +92,7 @@ func (o *objectMover) Move(ctx context.Context, namespace string, toCluster Clie
 		}
 	}
 
-	objectGraph, err := o.getObjectGraph(ctx, namespace)
+	objectGraph, err := o.getObjectGraph(ctx, namespace, clusterName)
 	if err != nil {
 		return errors.Wrap(err, "failed to get object graph")
 	}
@@ -103,11 +106,11 @@ func (o *objectMover) Move(ctx context.Context, namespace string, toCluster Clie
 	return o.move(ctx, objectGraph, proxy, mutators...)
 }
 
-func (o *objectMover) ToDirectory(ctx context.Context, namespace string, directory string) error {
+func (o *objectMover) ToDirectory(ctx context.Context, namespace string, directory, clusterName string) error {
 	log := logf.Log
 	log.Info("Moving to directory...")
 
-	objectGraph, err := o.getObjectGraph(ctx, namespace)
+	objectGraph, err := o.getObjectGraph(ctx, namespace, clusterName)
 	if err != nil {
 		return errors.Wrap(err, "failed to get object graph")
 	}
@@ -115,7 +118,7 @@ func (o *objectMover) ToDirectory(ctx context.Context, namespace string, directo
 	return o.toDirectory(ctx, objectGraph, directory)
 }
 
-func (o *objectMover) FromDirectory(ctx context.Context, toCluster Client, directory string) error {
+func (o *objectMover) FromDirectory(ctx context.Context, toCluster Client, directory, clusterName string) error {
 	log := logf.Log
 	log.Info("Moving from directory...")
 
@@ -148,6 +151,14 @@ func (o *objectMover) FromDirectory(ctx context.Context, toCluster Client, direc
 
 	// Check whether nodes are not included in GVK considered for fromDirectory.
 	objectGraph.checkVirtualNode()
+
+	// Filter and remove nodes in the graph that do not belong to cluster
+	if clusterName != "" {
+		err = objectGraph.filterCluster(clusterName)
+		if err != nil {
+			return errors.Wrap(err, "failed to filter for cluster")
+		}
+	}
 
 	// Restore the objects to the target cluster.
 	proxy := toCluster.Proxy()
@@ -186,7 +197,7 @@ func (o *objectMover) filesToObjs(dir string) ([]unstructured.Unstructured, erro
 	return objs, nil
 }
 
-func (o *objectMover) getObjectGraph(ctx context.Context, namespace string) (*objectGraph, error) {
+func (o *objectMover) getObjectGraph(ctx context.Context, namespace, clusterName string) (*objectGraph, error) {
 	objectGraph := newObjectGraph(o.fromProxy, o.fromProviderInventory)
 
 	// Gets all the types defined by the CRDs installed by clusterctl plus the ConfigMap/Secret core types.
@@ -198,7 +209,7 @@ func (o *objectMover) getObjectGraph(ctx context.Context, namespace string) (*ob
 	// Discovery the object graph for the selected types:
 	// - Nodes are defined the Kubernetes objects (Clusters, Machines etc.) identified during the discovery process.
 	// - Edges are derived by the OwnerReferences between nodes.
-	if err := objectGraph.Discovery(ctx, namespace); err != nil {
+	if err := objectGraph.Discovery(ctx, namespace, clusterName); err != nil {
 		return nil, errors.Wrap(err, "failed to discover the object graph")
 	}
 
