@@ -361,6 +361,13 @@ func TestKubeadmControlPlaneValidateUpdate(t *testing.T) {
 					CertificateValidityPeriodDays:   100,
 					CACertificateValidityPeriodDays: 365,
 					EncryptionAlgorithm:             bootstrapv1.EncryptionAlgorithmRSA2048,
+					RegistryMirror: bootstrapv1.RegistryMirrorConfiguration{
+						Endpoint: "https://1.1.1.1:1111",
+						CACert:   "test-cert",
+					},
+					CertBundles: []bootstrapv1.CertBundle{
+						{Name: "test-bundle", Data: "test-data"},
+					},
 				},
 				JoinConfiguration: bootstrapv1.JoinConfiguration{
 					NodeRegistration: bootstrapv1.NodeRegistrationOptions{
@@ -369,6 +376,13 @@ func TestKubeadmControlPlaneValidateUpdate(t *testing.T) {
 					Timeouts: bootstrapv1.Timeouts{
 						ControlPlaneComponentHealthCheckSeconds: ptr.To[int32](10),
 						KubeletHealthCheckSeconds:               ptr.To[int32](40),
+					},
+					RegistryMirror: bootstrapv1.RegistryMirrorConfiguration{
+						Endpoint: "https://1.1.1.1:1111",
+						CACert:   "test-cert",
+					},
+					CertBundles: []bootstrapv1.CertBundle{
+						{Name: "test-bundle", Data: "test-data"},
 					},
 				},
 				PreKubeadmCommands: []string{
@@ -789,6 +803,28 @@ func TestKubeadmControlPlaneValidateUpdate(t *testing.T) {
 
 	validUpdateJoinConfBRCustomBootstrapContainers := before.DeepCopy()
 	validUpdateJoinConfBRCustomBootstrapContainers.Spec.KubeadmConfigSpec.JoinConfiguration.BottlerocketCustomBootstrapContainers = []bootstrapv1.BottlerocketBootstrapContainer{{ImageRepository: "registry.k8s.io/bottlerocketbootstrap", ImageTag: "v1.1.0+new"}}
+
+	validUpdateClusterConfigRegistryMirrorCACert := before.DeepCopy()
+	validUpdateClusterConfigRegistryMirrorCACert.Spec.KubeadmConfigSpec.ClusterConfiguration.RegistryMirror.CACert = "foo:bar"
+
+	validUpdateJoinConfigRegistryMirrorCACert := before.DeepCopy()
+	validUpdateJoinConfigRegistryMirrorCACert.Spec.KubeadmConfigSpec.JoinConfiguration.RegistryMirror.CACert = "foo:bar"
+
+	validUpdateClusterConfigRegistryMirrorEndpoint := before.DeepCopy()
+	validUpdateClusterConfigRegistryMirrorEndpoint.Spec.KubeadmConfigSpec.ClusterConfiguration.RegistryMirror.Endpoint = "https://0.0.0.0:6443"
+
+	validUpdateJoinConfigRegistryMirrorEndpoint := before.DeepCopy()
+	validUpdateJoinConfigRegistryMirrorEndpoint.Spec.KubeadmConfigSpec.JoinConfiguration.RegistryMirror.Endpoint = "https://0.0.0.0:6443"
+
+	validUpdateClusterConfigCertBundles := before.DeepCopy()
+	validUpdateClusterConfigCertBundles.Spec.KubeadmConfigSpec.ClusterConfiguration.CertBundles = []bootstrapv1.CertBundle{
+		{Name: "new-bundle", Data: "new-data"},
+	}
+
+	validUpdateJoinConfigCertBundles := before.DeepCopy()
+	validUpdateJoinConfigCertBundles.Spec.KubeadmConfigSpec.JoinConfiguration.CertBundles = []bootstrapv1.CertBundle{
+		{Name: "new-bundle", Data: "new-data"},
+	}
 
 	beforeTaints := before.DeepCopy()
 	beforeTaints.Spec.MachineTemplate.Spec.Taints = []clusterv1.MachineTaint{
@@ -1233,6 +1269,43 @@ func TestKubeadmControlPlaneValidateUpdate(t *testing.T) {
 			expectErr: false,
 			before:    before,
 			kcp:       validUpdateJoinConfBRCustomBootstrapContainers,
+		},
+		{
+			name:      "should allow changes to join configuration registry mirror caCert",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateJoinConfigRegistryMirrorCACert,
+		},
+		{
+			name:      "should allow changes to join configuration registry mirror endpoint",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateJoinConfigRegistryMirrorEndpoint,
+		},
+		{
+			name:      "should allow changes to cluster configuration registry mirror caCert",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateClusterConfigRegistryMirrorCACert,
+		},
+
+		{
+			name:      "should allow changes to cluster configuration registry mirror endpoint",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateClusterConfigRegistryMirrorEndpoint,
+		},
+		{
+			name:      "should allow changes to cluster configuration certBundles",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateClusterConfigCertBundles,
+		},
+		{
+			name:      "should allow changes to join configuration certBundles",
+			expectErr: false,
+			before:    before,
+			kcp:       validUpdateJoinConfigCertBundles,
 		},
 		{
 			name:                "should not allow to add taints when feature gate is disabled",
