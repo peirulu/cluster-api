@@ -549,7 +549,7 @@ func createDockerContainer(ctx context.Context, name string, cluster *clusterv1.
 	}
 
 	log.Info("Creating container for machinePool", "name", name, "MachinePool", klog.KObj(machinePool), "machinePool.Spec.Template.Spec.Version", machinePool.Spec.Template.Spec.Version)
-	if err := externalMachine.Create(ctx, devMachinePool.Spec.Backend.Docker.CustomImage, constants.WorkerNodeRoleValue, machinePool.Spec.Template.Spec.Version, labels, devMachinePool.Spec.Backend.Docker.ExtraMounts); err != nil {
+	if err := externalMachine.Create(ctx, devMachinePool.Spec.Backend.Docker.CustomImage, constants.WorkerNodeRoleValue, machinePool.Spec.Template.Spec.Version, labels, devMachinePool.Spec.Backend.Docker.ExtraMounts, false); err != nil {
 		return errors.Wrapf(err, "failed to create docker machine with name %s", name)
 	}
 	return nil
