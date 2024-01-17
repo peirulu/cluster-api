@@ -3373,7 +3373,7 @@ func schema_cluster_api_api_core_v1beta2_MachineDeploymentClassRolloutStrategy(r
 				Properties: map[string]spec.Schema{
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "type of rollout. Allowed values are RollingUpdate and OnDelete. Default is RollingUpdate.",
+							Description: "type of rollout strategy to use. Supported values: - `RollingUpdate`: replaces the old MachineSet by new one using rolling update i.e. gradually scale down the old MachineSet and scale up the new one. - `OnDelete`: replaces old MachineSets when the deletion of the associated machines are completed. - `InPlace`: upgrades the machines within the same MachineSet without rolling out any new nodes.\n\nDefault is RollingUpdate.",
 							Type:        []string{"string"},
 							Format:      "",
 						},

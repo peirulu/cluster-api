@@ -682,7 +682,7 @@ func NewMSNewReplicas(deployment *clusterv1.MachineDeployment, allMSs []*cluster
 		// Do not exceed the number of desired replicas.
 		scaleUpCount = min(scaleUpCount, *(deployment.Spec.Replicas)-newMSReplicas)
 		return newMSReplicas + scaleUpCount, fmt.Sprintf("%d current Machines < %d MachineDeployment spec.replicas + %d maxSurge", currentMachineCount, ptr.Deref(deployment.Spec.Replicas, 0), maxSurge), nil
-	case clusterv1.OnDeleteMachineDeploymentStrategyType:
+	case clusterv1.OnDeleteMachineDeploymentStrategyType, clusterv1.InPlaceMachineDeploymentStrategyType:
 		// Find the total number of machines
 		currentMachineCount := TotalMachineSetsReplicaSum(allMSs)
 		if currentMachineCount >= *(deployment.Spec.Replicas) {

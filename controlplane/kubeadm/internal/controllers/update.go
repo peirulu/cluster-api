@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"time"
 
 	"github.com/blang/semver/v4"
 	"github.com/pkg/errors"
@@ -28,6 +29,7 @@ import (
 	controlplanev1 "sigs.k8s.io/cluster-api/api/controlplane/kubeadm/v1beta2"
 	"sigs.k8s.io/cluster-api/controlplane/kubeadm/internal"
 	"sigs.k8s.io/cluster-api/feature"
+	"sigs.k8s.io/cluster-api/util/annotations"
 	"sigs.k8s.io/cluster-api/util/collections"
 )
 
@@ -95,8 +97,12 @@ func (r *KubeadmControlPlaneReconciler) updateControlPlane(
 			return ctrl.Result{}, errors.Wrapf(err, "failed to update control plane")
 		}
 		return res, nil
+	case controlplanev1.InPlaceUpgradeStrategyType:
+		annotations.AddAnnotations(controlPlane.KCP, map[string]string{controlplanev1.InPlaceUpgradeAnnotation: "true"})
+		log.Info("RolloutStrategy type set to InPlaceUpgradeStrategyType, adding the annotation and requeuing", "annotation", controlplanev1.InPlaceUpgradeAnnotation)
+		return ctrl.Result{RequeueAfter: time.Second * 30}, nil
 	default:
-		log.Info("RolloutStrategy type is not set to RollingUpdate, unable to determine the strategy for rolling out machines")
+		log.Info("RolloutStrategy type is not set to RollingUpdateStrategyType or InPlaceUpgradeStrategyType, unable to determine the strategy for rolling out machines")
 		return ctrl.Result{}, nil
 	}
 }

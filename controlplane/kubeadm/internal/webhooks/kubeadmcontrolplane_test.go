@@ -41,39 +41,143 @@ var (
 )
 
 func TestKubeadmControlPlaneDefault(t *testing.T) {
-	g := NewWithT(t)
-
-	kcp := &controlplanev1.KubeadmControlPlane{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: "foo",
-		},
-		Spec: controlplanev1.KubeadmControlPlaneSpec{
-			Version: "v1.18.3",
-			MachineTemplate: controlplanev1.KubeadmControlPlaneMachineTemplate{
-				Spec: controlplanev1.KubeadmControlPlaneMachineTemplateSpec{
-					InfrastructureRef: clusterv1.ContractVersionedObjectReference{
-						APIGroup: "test",
-						Kind:     "UnknownInfraMachine",
-						Name:     "foo",
+	t.Run("should default to RollingUpdate strategy when not specified", func(t *testing.T) {
+		g := NewWithT(t)
+		kcp := &controlplanev1.KubeadmControlPlane{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "foo",
+			},
+			Spec: controlplanev1.KubeadmControlPlaneSpec{
+				Version: "v1.18.3",
+				MachineTemplate: controlplanev1.KubeadmControlPlaneMachineTemplate{
+					Spec: controlplanev1.KubeadmControlPlaneMachineTemplateSpec{
+						InfrastructureRef: clusterv1.ContractVersionedObjectReference{
+							APIGroup: "test",
+							Kind:     "UnknownInfraMachine",
+							Name:     "foo",
+						},
 					},
 				},
 			},
-		},
-	}
-	updateDefaultingValidationKCP := kcp.DeepCopy()
-	updateDefaultingValidationKCP.Spec.Version = "v1.18.3"
-	updateDefaultingValidationKCP.Spec.MachineTemplate.Spec.InfrastructureRef = clusterv1.ContractVersionedObjectReference{
-		APIGroup: "test",
-		Kind:     "UnknownInfraMachine",
-		Name:     "foo",
-	}
-	webhook := &KubeadmControlPlane{}
-	t.Run("for KubeadmControlPlane", util.CustomDefaultValidateTest[*controlplanev1.KubeadmControlPlane](ctx, updateDefaultingValidationKCP, webhook))
-	g.Expect(webhook.Default(ctx, kcp)).To(Succeed())
+		}
+		updateDefaultingValidationKCP := kcp.DeepCopy()
+		updateDefaultingValidationKCP.Spec.Version = "v1.18.3"
+		updateDefaultingValidationKCP.Spec.MachineTemplate.Spec.InfrastructureRef = clusterv1.ContractVersionedObjectReference{
+			APIGroup: "test",
+			Kind:     "UnknownInfraMachine",
+			Name:     "foo",
+		}
+		webhook := &KubeadmControlPlane{}
+		t.Run("for KubeadmControlPlane", util.CustomDefaultValidateTest[*controlplanev1.KubeadmControlPlane](ctx, updateDefaultingValidationKCP, webhook))
+		g.Expect(webhook.Default(ctx, kcp)).To(Succeed())
 
-	g.Expect(kcp.Spec.Version).To(Equal("v1.18.3"))
-	g.Expect(kcp.Spec.Rollout.Strategy.Type).To(Equal(controlplanev1.RollingUpdateStrategyType))
-	g.Expect(kcp.Spec.Rollout.Strategy.RollingUpdate.MaxSurge.IntVal).To(Equal(int32(1)))
+		g.Expect(kcp.Spec.Version).To(Equal("v1.18.3"))
+		g.Expect(kcp.Spec.Rollout.Strategy.Type).To(Equal(controlplanev1.RollingUpdateStrategyType))
+		g.Expect(kcp.Spec.Rollout.Strategy.RollingUpdate.MaxSurge.IntVal).To(Equal(int32(1)))
+	})
+
+	t.Run("should preserve InPlace strategy and not set MaxSurge", func(t *testing.T) {
+		g := NewWithT(t)
+		kcp := &controlplanev1.KubeadmControlPlane{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "foo",
+			},
+			Spec: controlplanev1.KubeadmControlPlaneSpec{
+				Version: "v1.18.3",
+				MachineTemplate: controlplanev1.KubeadmControlPlaneMachineTemplate{
+					Spec: controlplanev1.KubeadmControlPlaneMachineTemplateSpec{
+						InfrastructureRef: clusterv1.ContractVersionedObjectReference{
+							APIGroup: "test",
+							Kind:     "UnknownInfraMachine",
+							Name:     "foo",
+						},
+					},
+				},
+				Rollout: controlplanev1.KubeadmControlPlaneRolloutSpec{
+					Strategy: controlplanev1.KubeadmControlPlaneRolloutStrategy{
+						Type: controlplanev1.InPlaceUpgradeStrategyType,
+					},
+				},
+			},
+		}
+		webhook := &KubeadmControlPlane{}
+		g.Expect(webhook.Default(ctx, kcp)).To(Succeed())
+
+		g.Expect(kcp.Spec.Version).To(Equal("v1.18.3"))
+		g.Expect(kcp.Spec.Rollout.Strategy.Type).To(Equal(controlplanev1.InPlaceUpgradeStrategyType))
+		g.Expect(kcp.Spec.Rollout.Strategy.RollingUpdate.MaxSurge).To(BeNil())
+	})
+
+	t.Run("should preserve RollingUpdate strategy with custom MaxSurge", func(t *testing.T) {
+		g := NewWithT(t)
+		customMaxSurge := intstr.FromInt32(3)
+		kcp := &controlplanev1.KubeadmControlPlane{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "foo",
+			},
+			Spec: controlplanev1.KubeadmControlPlaneSpec{
+				Version: "v1.18.3",
+				MachineTemplate: controlplanev1.KubeadmControlPlaneMachineTemplate{
+					Spec: controlplanev1.KubeadmControlPlaneMachineTemplateSpec{
+						InfrastructureRef: clusterv1.ContractVersionedObjectReference{
+							APIGroup: "test",
+							Kind:     "UnknownInfraMachine",
+							Name:     "foo",
+						},
+					},
+				},
+				Rollout: controlplanev1.KubeadmControlPlaneRolloutSpec{
+					Strategy: controlplanev1.KubeadmControlPlaneRolloutStrategy{
+						Type: controlplanev1.RollingUpdateStrategyType,
+						RollingUpdate: controlplanev1.KubeadmControlPlaneRolloutStrategyRollingUpdate{
+							MaxSurge: &customMaxSurge,
+						},
+					},
+				},
+			},
+		}
+		webhook := &KubeadmControlPlane{}
+		g.Expect(webhook.Default(ctx, kcp)).To(Succeed())
+
+		g.Expect(kcp.Spec.Version).To(Equal("v1.18.3"))
+		g.Expect(kcp.Spec.Rollout.Strategy.Type).To(Equal(controlplanev1.RollingUpdateStrategyType))
+		g.Expect(kcp.Spec.Rollout.Strategy.RollingUpdate.MaxSurge.IntVal).To(Equal(int32(3)))
+	})
+
+	t.Run("should default type to RollingUpdate when only MaxSurge is specified", func(t *testing.T) {
+		g := NewWithT(t)
+		customMaxSurge := intstr.FromInt32(0)
+		kcp := &controlplanev1.KubeadmControlPlane{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "foo",
+			},
+			Spec: controlplanev1.KubeadmControlPlaneSpec{
+				Version: "v1.18.3",
+				MachineTemplate: controlplanev1.KubeadmControlPlaneMachineTemplate{
+					Spec: controlplanev1.KubeadmControlPlaneMachineTemplateSpec{
+						InfrastructureRef: clusterv1.ContractVersionedObjectReference{
+							APIGroup: "test",
+							Kind:     "UnknownInfraMachine",
+							Name:     "foo",
+						},
+					},
+				},
+				Rollout: controlplanev1.KubeadmControlPlaneRolloutSpec{
+					Strategy: controlplanev1.KubeadmControlPlaneRolloutStrategy{
+						RollingUpdate: controlplanev1.KubeadmControlPlaneRolloutStrategyRollingUpdate{
+							MaxSurge: &customMaxSurge,
+						},
+					},
+				},
+			},
+		}
+		webhook := &KubeadmControlPlane{}
+		g.Expect(webhook.Default(ctx, kcp)).To(Succeed())
+
+		g.Expect(kcp.Spec.Version).To(Equal("v1.18.3"))
+		g.Expect(kcp.Spec.Rollout.Strategy.Type).To(Equal(controlplanev1.RollingUpdateStrategyType))
+		g.Expect(kcp.Spec.Rollout.Strategy.RollingUpdate.MaxSurge.IntVal).To(Equal(int32(0)))
+	})
 }
 
 func TestKubeadmControlPlaneValidateCreate(t *testing.T) {

@@ -29,13 +29,16 @@ import (
 )
 
 // RolloutStrategyType defines the rollout strategies for a KubeadmControlPlane.
-// +kubebuilder:validation:Enum=RollingUpdate
+// +kubebuilder:validation:Enum=RollingUpdate;InPlace
 type RolloutStrategyType string
 
 const (
 	// RollingUpdateStrategyType replaces the old control planes by new one using rolling update
 	// i.e. gradually scale up or down the old control planes and scale up or down the new one.
 	RollingUpdateStrategyType RolloutStrategyType = "RollingUpdate"
+
+	// InPlaceUpgradeStrategyType updates the node in place by delegating the upgrade to an external entity.
+	InPlaceUpgradeStrategyType RolloutStrategyType = "InPlace"
 )
 
 const (
@@ -75,6 +78,11 @@ const (
 	// DefaultMinHealthyPeriod defines the default minimum period before we consider a remediation on a
 	// machine unrelated from the previous remediation.
 	DefaultMinHealthyPeriod = 1 * time.Hour
+
+	// InPlaceUpgradeAnnotation is used to denote that the KCP object needs to be in-place upgraded by an external entity.
+	// This annotation will be added to the KCP object when `rolloutStrategy.type` is set to `InPlace`.
+	// The external upgrader entity should watch for the annotation and trigger an upgrade when it's added.
+	InPlaceUpgradeAnnotation = "controlplane.clusters.x-k8s.io/in-place-upgrade-needed"
 )
 
 // KubeadmControlPlaneSpec defines the desired state of KubeadmControlPlane.
@@ -210,8 +218,12 @@ type RolloutBefore struct {
 // RolloutStrategy describes how to replace existing machines
 // with new ones.
 type RolloutStrategy struct {
-	// type of rollout. Currently the only supported strategy is
-	// "RollingUpdate".
+	// type of rollout strategy to use.
+	// Supported values:
+	// - `RollingUpdate`: RollingUpdateStrategyType replaces the old control planes by new one using rolling update
+	// i.e. gradually scale up or down the old control planes and scale up or down the new one.
+	// - `InPlace`: updates the node in place by delegating the upgrade to an external entity.
+	//
 	// Default is RollingUpdate.
 	// +optional
 	Type RolloutStrategyType `json:"type,omitempty"`

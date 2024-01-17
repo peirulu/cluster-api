@@ -4559,6 +4559,7 @@ spec:
                                   enum:
                                   - RollingUpdate
                                   - OnDelete
+                                  - InPlace
                                   type: string
                               required:
                               - type

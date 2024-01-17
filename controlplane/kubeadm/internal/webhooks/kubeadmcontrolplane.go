@@ -355,12 +355,12 @@ func validateRolloutAndCertValidityFields(rolloutSpec controlplanev1.KubeadmCont
 		return nil
 	}
 
-	if rolloutStrategy.Type != controlplanev1.RollingUpdateStrategyType {
+	if rolloutStrategy.Type != controlplanev1.RollingUpdateStrategyType && rolloutStrategy.Type != controlplanev1.InPlaceUpgradeStrategyType {
 		allErrs = append(
 			allErrs,
 			field.Required(
 				pathPrefix.Child("rollout", "strategy", "type"),
-				"only RollingUpdate is supported",
+				"only RollingUpdateStrategyType and InPlaceUpgradeStrategyType are supported",
 			),
 		)
 	}

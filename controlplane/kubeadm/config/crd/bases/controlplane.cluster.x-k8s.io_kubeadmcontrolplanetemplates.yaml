@@ -2941,11 +2941,16 @@ spec:
                             type: object
                           type:
                             description: |-
-                              type of rollout. Currently the only supported strategy is
-                              "RollingUpdate".
+                              type of rollout strategy to use.
+                              Supported values:
+                              - `RollingUpdate`: RollingUpdateStrategyType replaces the old control planes by new one using rolling update
+                              i.e. gradually scale up or down the old control planes and scale up or down the new one.
+                              - `InPlace`: updates the node in place by delegating the upgrade to an external entity.
+
                               Default is RollingUpdate.
                             enum:
                             - RollingUpdate
+                            - InPlace
                             type: string
                         type: object
                     required:
@@ -6322,11 +6327,16 @@ spec:
                                 type: object
                               type:
                                 description: |-
-                                  type of rollout. Currently the only supported strategy is
-                                  "RollingUpdate".
+                                  type of rollout strategy to use.
+                                  Supported values:
+                                  - `RollingUpdate`: RollingUpdateStrategyType replaces the old control planes by new one using rolling update
+                                  i.e. gradually scale up or down the old control planes and scale up or down the new one.
+                                  - `InPlace`: updates the node in place by delegating the upgrade to an external entity.
+
                                   Default is RollingUpdate.
                                 enum:
                                 - RollingUpdate
+                                - InPlace
                                 type: string
                             required:
                             - type

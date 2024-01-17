@@ -326,6 +326,10 @@ func (r *Reconciler) reconcile(ctx context.Context, s *scope) error {
 		return r.rolloutOnDelete(ctx, md, s.machineSets, s.machines, templateExists)
 	}
 
+	if md.Spec.Rollout.Strategy.Type == clusterv1.InPlaceMachineDeploymentStrategyType {
+		return r.rolloutInPlace(ctx, md, s.machineSets, templateExists)
+	}
+
 	return errors.Errorf("unexpected deployment strategy type: %s", md.Spec.Rollout.Strategy.Type)
 }
 
