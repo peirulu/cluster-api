@@ -134,8 +134,9 @@ provider-id = "PROVIDERID"
 
 [settings.network]
 hostname = "hostname"
-[settings.container-registry.mirrors]
-"public.ecr.aws" = ["https://REGISTRY_ENDPOINT"]
+[[settings.container-registry.mirrors]]
+registry = "public.ecr.aws"
+endpoint = ["REGISTRY_ENDPOINT"]
 [settings.pki.registry-mirror-ca]
 data = "UkVHSVNUUllfQ0E="
 trusted=true`
@@ -162,8 +163,9 @@ provider-id = "PROVIDERID"
 
 [settings.network]
 hostname = "hostname"
-[settings.container-registry.mirrors]
-"public.ecr.aws" = ["https://REGISTRY_ENDPOINT"]
+[[settings.container-registry.mirrors]]
+registry = "public.ecr.aws"
+endpoint = ["REGISTRY_ENDPOINT"]
 [settings.pki.registry-mirror-ca]
 data = "UkVHSVNUUllfQ0E="
 trusted=true
@@ -338,6 +340,39 @@ trusted = true
 [settings.pki.bundle2]
 data = "MTIzNDU2"
 trusted = true`
+
+	registryMirrorMultipleMirrorsUserData = `
+[settings.host-containers.admin]
+enabled = true
+superpowered = true
+source = "ADMIN_REPO:ADMIN_TAG"
+user-data = "CnsKCSJzc2giOiB7CgkJImF1dGhvcml6ZWQta2V5cyI6IFsic3NoLXJzYSBBQUEuLi4iXQoJfQp9"
+[settings.host-containers.kubeadm-bootstrap]
+enabled = true
+superpowered = true
+source = "BOOTSTRAP_REPO:BOOTSTRAP_TAG"
+user-data = "Qk9UVExFUk9DS0VUX0JPT1RTVFJBUF9VU0VSREFUQQ=="
+
+[settings.kubernetes]
+cluster-domain = "cluster.local"
+standalone-mode = true
+authentication-mode = "tls"
+server-tls-bootstrap = false
+pod-infra-container-image = "PAUSE_REPO:PAUSE_TAG"
+provider-id = "PROVIDERID"
+
+[settings.network]
+hostname = "hostname"
+
+[[settings.container-registry.mirrors]]
+registry = "docker.io"
+endpoint = ["REGISTRY_ENDPOINT"]
+[[settings.container-registry.mirrors]]
+registry = "public.ecr.aws"
+endpoint = ["REGISTRY_ENDPOINT"]
+[settings.pki.registry-mirror-ca]
+data = "UkVHSVNUUllfQ0E="
+trusted=true`
 )
 
 var (
@@ -650,6 +685,35 @@ func TestGetBottlerocketNodeUserData(t *testing.T) {
 				},
 			},
 			output: userDataWithCertBundle,
+		},
+		{
+			name: "with multiple registries to mirror",
+			config: &BottlerocketConfig{
+				BottlerocketAdmin:     brAdmin,
+				BottlerocketBootstrap: brBootstrap,
+				Hostname:              hostname,
+				Pause:                 pause,
+				KubeletExtraArgs: []bootstrapv1.Arg{
+					{
+						Name:  "provider-id",
+						Value: stringPtr("PROVIDERID"),
+					},
+				},
+				RegistryMirrorConfiguration: bootstrapv1.RegistryMirrorConfiguration{
+					CACert: "REGISTRY_CA",
+					Mirrors: []bootstrapv1.Mirror{
+						{
+							Registry:  "docker.io",
+							Endpoints: []string{"REGISTRY_ENDPOINT"},
+						},
+						{
+							Registry:  "public.ecr.aws",
+							Endpoints: []string{"REGISTRY_ENDPOINT"},
+						},
+					},
+				},
+			},
+			output: registryMirrorMultipleMirrorsUserData,
 		},
 	}
 	for _, testcase := range testcases {

@@ -39,6 +39,9 @@ const (
 	// i.e. gradually scale down the old MachineSet and scale up the new one.
 	RollingUpdateMachineDeploymentStrategyType MachineDeploymentStrategyType = "RollingUpdate"
 
+	// InPlaceMachineDeploymentStrategyType upgrades the machines within the same MachineSet without rolling out any new nodes.
+	InPlaceMachineDeploymentStrategyType MachineDeploymentStrategyType = "InPlace"
+
 	// OnDeleteMachineDeploymentStrategyType replaces old MachineSets when the deletion of the associated machines are completed.
 	OnDeleteMachineDeploymentStrategyType MachineDeploymentStrategyType = "OnDelete"
 
@@ -59,6 +62,12 @@ const (
 	// is machinedeployment.spec.replicas + maxSurge. Used by the underlying machine sets to estimate their
 	// proportions in case the deployment has surge replicas.
 	MaxReplicasAnnotation = "machinedeployment.clusters.x-k8s.io/max-replicas"
+
+	// MachineDeploymentInPlaceUpgradeAnnotation is used to denote that the MachineDeployment needs to be in-place upgraded by an external entity.
+	// This annotation will be added to the MD object when `strategy.type` is set to `InPlace`.
+	// The external upgrader entity should watch for the annotation and trigger an upgrade when it's added.
+	// Once the upgrade is complete, the external upgrade implementer is also responsible for removing this annotation.
+	MachineDeploymentInPlaceUpgradeAnnotation = "machinedeployment.clusters.x-k8s.io/in-place-upgrade-needed"
 
 	// MachineDeploymentUniqueLabel is used to uniquely identify the Machines of a MachineSet.
 	// The MachineDeployment controller will set this label on a MachineSet when it is created.
@@ -326,9 +335,14 @@ type MachineDeploymentSpec struct {
 // MachineDeploymentStrategy describes how to replace existing machines
 // with new ones.
 type MachineDeploymentStrategy struct {
-	// type of deployment. Allowed values are RollingUpdate and OnDelete.
+	// type of rollout strategy to use.
+	// Supported values:
+	// - `RollingUpdate`: replaces the old MachineSet by new one using rolling update
+	// i.e. gradually scale down the old MachineSet and scale up the new one.
+	// - `OnDelete`: replaces old MachineSets when the deletion of the associated machines are completed.
+	// - `InPlace`: upgrades the machines within the same MachineSet without rolling out any new nodes.
 	// The default is RollingUpdate.
-	// +kubebuilder:validation:Enum=RollingUpdate;OnDelete
+	// +kubebuilder:validation:Enum=RollingUpdate;OnDelete;InPlace
 	// +optional
 	Type MachineDeploymentStrategyType `json:"type,omitempty"`
 

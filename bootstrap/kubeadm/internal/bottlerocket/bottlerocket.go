@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
@@ -67,6 +68,7 @@ type BottlerocketSettingsInput struct {
 	BootstrapContainers        []bootstrapv1.BottlerocketBootstrapContainer
 	SysctlSettings             string
 	CertBundles                []bootstrapv1.CertBundle
+	RegistryMirrorMap          map[string][]string
 }
 
 // HostPath holds the path and type of a host path volume.
@@ -237,7 +239,6 @@ func getBottlerocketNodeUserData(bootstrapContainerUserData []byte, users []boot
 		BootstrapContainerSource: fmt.Sprintf("%s:%s", config.BottlerocketBootstrap.ImageRepository, config.BottlerocketBootstrap.ImageTag),
 		PauseContainerSource:     fmt.Sprintf("%s:%s", config.Pause.ImageRepository, config.Pause.ImageTag),
 		HTTPSProxyEndpoint:       config.ProxyConfiguration.HTTPSProxy,
-		RegistryMirrorEndpoint:   config.RegistryMirrorConfiguration.Endpoint,
 		NodeLabels:               parseNodeLabels(getArgValue(config.KubeletExtraArgs, "node-labels")), // empty string if it does not exist
 		Taints:                   parseTaints(config.Taints),                                           //empty string if it does not exist
 		ProviderID:               getArgValue(config.KubeletExtraArgs, "provider-id"),
@@ -251,6 +252,31 @@ func getBottlerocketNodeUserData(bootstrapContainerUserData []byte, users []boot
 			bottlerocketInput.NoProxyEndpoints = append(bottlerocketInput.NoProxyEndpoints, strconv.Quote(noProxy))
 		}
 	}
+
+	// When RegistryMirrorConfiguration.Endpoint is specified, we default the mirror to public.ecr.aws.
+	// This was done for backward compatability, since public.ecr.aws was the only supported registry before.
+	// For existing customers this ensures that their nodes dont rollout, unless more mirrors are specified explicitly.
+	// If RegistryMirrorConfiguration.Endpoint is not specified, we iterate the RegistryMirrorConfiguration.Mirrors to setup the mirrors.
+	bottlerocketInput.RegistryMirrorMap = make(map[string][]string)
+	endpointRegex := regexp.MustCompile(`^(https?:\/\/)?[\w\.\:\-]+`)
+	if config.RegistryMirrorConfiguration.Endpoint != "" {
+		bottlerocketInput.RegistryMirrorMap["public.ecr.aws"] = []string{strconv.Quote(config.RegistryMirrorConfiguration.Endpoint)}
+		if endpoint := endpointRegex.FindStringSubmatch(config.RegistryMirrorConfiguration.Endpoint); endpoint != nil {
+			bottlerocketInput.RegistryMirrorEndpoint = endpoint[0]
+		}
+	} else if len(config.RegistryMirrorConfiguration.Mirrors) > 0 {
+		for _, mirror := range config.RegistryMirrorConfiguration.Mirrors {
+			for _, endpoint := range mirror.Endpoints {
+				bottlerocketInput.RegistryMirrorMap[mirror.Registry] = append(bottlerocketInput.RegistryMirrorMap[mirror.Registry], strconv.Quote(endpoint))
+			}
+		}
+
+		// Right now we support only one private registry. Hence defaulting to first entry.
+		if endpoint := endpointRegex.FindStringSubmatch(config.RegistryMirrorConfiguration.Mirrors[0].Endpoints[0]); endpoint != nil {
+			bottlerocketInput.RegistryMirrorEndpoint = endpoint[0]
+		}
+	}
+
 	if config.RegistryMirrorConfiguration.CACert != "" {
 		bottlerocketInput.RegistryMirrorCACert = base64.StdEncoding.EncodeToString([]byte(config.RegistryMirrorConfiguration.CACert))
 	}
