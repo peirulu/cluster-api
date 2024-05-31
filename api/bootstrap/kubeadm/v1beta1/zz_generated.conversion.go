@@ -902,9 +902,37 @@ func Convert_v1beta2_BottlerocketKernelSettings_To_v1beta1_BottlerocketKernelSet
 }
 
 func autoConvert_v1beta1_BottlerocketKubernetesSettings_To_v1beta2_BottlerocketKubernetesSettings(in *BottlerocketKubernetesSettings, out *v1beta2.BottlerocketKubernetesSettings, s conversion.Scope) error {
-	out.MaxPods = in.MaxPods
 	out.AllowedUnsafeSysctls = *(*[]string)(unsafe.Pointer(&in.AllowedUnsafeSysctls))
 	out.ClusterDNSIPs = *(*[]string)(unsafe.Pointer(&in.ClusterDNSIPs))
+	out.ClusterDomain = in.ClusterDomain
+	out.ContainerLogMaxFiles = in.ContainerLogMaxFiles
+	out.ContainerLogMaxSize = in.ContainerLogMaxSize
+	out.CPUCFSQuota = (*bool)(unsafe.Pointer(in.CPUCFSQuota))
+	out.CPUManagerPolicy = in.CPUManagerPolicy
+	out.CPUManagerPolicyOptions = *(*map[string]string)(unsafe.Pointer(&in.CPUManagerPolicyOptions))
+	out.CPUManagerReconcilePeriod = (*v1.Duration)(unsafe.Pointer(in.CPUManagerReconcilePeriod))
+	out.EventBurst = in.EventBurst
+	out.EventRecordQPS = in.EventRecordQPS
+	out.EvictionHard = *(*map[string]string)(unsafe.Pointer(&in.EvictionHard))
+	out.EvictionMaxPodGracePeriod = in.EvictionMaxPodGracePeriod
+	out.EvictionSoft = *(*map[string]string)(unsafe.Pointer(&in.EvictionSoft))
+	out.EvictionSoftGracePeriod = *(*map[string]string)(unsafe.Pointer(&in.EvictionSoftGracePeriod))
+	out.ImageGCHighThresholdPercent = in.ImageGCHighThresholdPercent
+	out.ImageGCLowThresholdPercent = in.ImageGCLowThresholdPercent
+	out.KubeAPIBurst = in.KubeAPIBurst
+	out.KubeAPIQPS = in.KubeAPIQPS
+	out.KubeReserved = *(*map[string]string)(unsafe.Pointer(&in.KubeReserved))
+	out.MaxPods = in.MaxPods
+	out.MemoryManagerPolicy = in.MemoryManagerPolicy
+	out.PodPidsLimit = in.PodPidsLimit
+	out.ProviderID = in.ProviderID
+	out.RegistryBurst = in.RegistryBurst
+	out.RegistryPullQPS = in.RegistryPullQPS
+	out.ShutdownGracePeriod = (*v1.Duration)(unsafe.Pointer(in.ShutdownGracePeriod))
+	out.ShutdownGracePeriodCriticalPods = (*v1.Duration)(unsafe.Pointer(in.ShutdownGracePeriodCriticalPods))
+	out.SystemReserved = *(*map[string]string)(unsafe.Pointer(&in.SystemReserved))
+	out.TopologyManagerPolicy = in.TopologyManagerPolicy
+	out.TopologyManagerScope = in.TopologyManagerScope
 	return nil
 }
 
@@ -914,9 +942,37 @@ func Convert_v1beta1_BottlerocketKubernetesSettings_To_v1beta2_BottlerocketKuber
 }
 
 func autoConvert_v1beta2_BottlerocketKubernetesSettings_To_v1beta1_BottlerocketKubernetesSettings(in *v1beta2.BottlerocketKubernetesSettings, out *BottlerocketKubernetesSettings, s conversion.Scope) error {
-	out.MaxPods = in.MaxPods
 	out.AllowedUnsafeSysctls = *(*[]string)(unsafe.Pointer(&in.AllowedUnsafeSysctls))
 	out.ClusterDNSIPs = *(*[]string)(unsafe.Pointer(&in.ClusterDNSIPs))
+	out.ClusterDomain = in.ClusterDomain
+	out.ContainerLogMaxFiles = in.ContainerLogMaxFiles
+	out.ContainerLogMaxSize = in.ContainerLogMaxSize
+	out.CPUCFSQuota = (*bool)(unsafe.Pointer(in.CPUCFSQuota))
+	out.CPUManagerPolicy = in.CPUManagerPolicy
+	out.CPUManagerPolicyOptions = *(*map[string]string)(unsafe.Pointer(&in.CPUManagerPolicyOptions))
+	out.CPUManagerReconcilePeriod = (*v1.Duration)(unsafe.Pointer(in.CPUManagerReconcilePeriod))
+	out.EventBurst = in.EventBurst
+	out.EventRecordQPS = in.EventRecordQPS
+	out.EvictionHard = *(*map[string]string)(unsafe.Pointer(&in.EvictionHard))
+	out.EvictionMaxPodGracePeriod = in.EvictionMaxPodGracePeriod
+	out.EvictionSoft = *(*map[string]string)(unsafe.Pointer(&in.EvictionSoft))
+	out.EvictionSoftGracePeriod = *(*map[string]string)(unsafe.Pointer(&in.EvictionSoftGracePeriod))
+	out.ImageGCHighThresholdPercent = in.ImageGCHighThresholdPercent
+	out.ImageGCLowThresholdPercent = in.ImageGCLowThresholdPercent
+	out.KubeAPIBurst = in.KubeAPIBurst
+	out.KubeAPIQPS = in.KubeAPIQPS
+	out.KubeReserved = *(*map[string]string)(unsafe.Pointer(&in.KubeReserved))
+	out.MaxPods = in.MaxPods
+	out.MemoryManagerPolicy = in.MemoryManagerPolicy
+	out.PodPidsLimit = in.PodPidsLimit
+	out.ProviderID = in.ProviderID
+	out.RegistryBurst = in.RegistryBurst
+	out.RegistryPullQPS = in.RegistryPullQPS
+	out.ShutdownGracePeriod = (*v1.Duration)(unsafe.Pointer(in.ShutdownGracePeriod))
+	out.ShutdownGracePeriodCriticalPods = (*v1.Duration)(unsafe.Pointer(in.ShutdownGracePeriodCriticalPods))
+	out.SystemReserved = *(*map[string]string)(unsafe.Pointer(&in.SystemReserved))
+	out.TopologyManagerPolicy = in.TopologyManagerPolicy
+	out.TopologyManagerScope = in.TopologyManagerScope
 	return nil
 }
 

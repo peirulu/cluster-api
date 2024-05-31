@@ -21,8 +21,8 @@ limitations under the License.
 package v1beta2
 
 import (
-	"k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	corev1beta2 "sigs.k8s.io/cluster-api/api/core/v1beta2"
 )
@@ -319,6 +319,68 @@ func (in *BottlerocketKubernetesSettings) DeepCopyInto(out *BottlerocketKubernet
 		in, out := &in.ClusterDNSIPs, &out.ClusterDNSIPs
 		*out = make([]string, len(*in))
 		copy(*out, *in)
+	}
+	if in.CPUCFSQuota != nil {
+		in, out := &in.CPUCFSQuota, &out.CPUCFSQuota
+		*out = new(bool)
+		**out = **in
+	}
+	if in.CPUManagerPolicyOptions != nil {
+		in, out := &in.CPUManagerPolicyOptions, &out.CPUManagerPolicyOptions
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+	if in.CPUManagerReconcilePeriod != nil {
+		in, out := &in.CPUManagerReconcilePeriod, &out.CPUManagerReconcilePeriod
+		*out = new(v1.Duration)
+		**out = **in
+	}
+	if in.EvictionHard != nil {
+		in, out := &in.EvictionHard, &out.EvictionHard
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+	if in.EvictionSoft != nil {
+		in, out := &in.EvictionSoft, &out.EvictionSoft
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+	if in.EvictionSoftGracePeriod != nil {
+		in, out := &in.EvictionSoftGracePeriod, &out.EvictionSoftGracePeriod
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+	if in.KubeReserved != nil {
+		in, out := &in.KubeReserved, &out.KubeReserved
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+	if in.ShutdownGracePeriod != nil {
+		in, out := &in.ShutdownGracePeriod, &out.ShutdownGracePeriod
+		*out = new(v1.Duration)
+		**out = **in
+	}
+	if in.ShutdownGracePeriodCriticalPods != nil {
+		in, out := &in.ShutdownGracePeriodCriticalPods, &out.ShutdownGracePeriodCriticalPods
+		*out = new(v1.Duration)
+		**out = **in
+	}
+	if in.SystemReserved != nil {
+		in, out := &in.SystemReserved, &out.SystemReserved
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
 	}
 }
 
@@ -1116,7 +1178,7 @@ func (in *KubeadmConfigStatus) DeepCopyInto(out *KubeadmConfigStatus) {
 	*out = *in
 	if in.Conditions != nil {
 		in, out := &in.Conditions, &out.Conditions
-		*out = make([]metav1.Condition, len(*in))
+		*out = make([]v1.Condition, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -1364,10 +1426,10 @@ func (in *NodeRegistrationOptions) DeepCopyInto(out *NodeRegistrationOptions) {
 	*out = *in
 	if in.Taints != nil {
 		in, out := &in.Taints, &out.Taints
-		*out = new([]v1.Taint)
+		*out = new([]corev1.Taint)
 		if **in != nil {
 			in, out := *in, *out
-			*out = make([]v1.Taint, len(*in))
+			*out = make([]corev1.Taint, len(*in))
 			for i := range *in {
 				(*in)[i].DeepCopyInto(&(*out)[i])
 			}
