@@ -106,7 +106,6 @@ func initConfigurationFuzzFuncs(_ runtimeserializer.CodecFactory) []interface{} 
 func spokeClusterConfigurationFuzzer(obj *ClusterConfiguration, c randfill.Continue) {
 	c.FillNoCustom(obj)
 
-	obj.Proxy = Proxy{}
 	obj.CertificateValidityPeriod = ptr.To[metav1.Duration](metav1.Duration{Duration: time.Duration(c.Int31n(3*365)+1) * time.Hour * 24})
 	obj.CACertificateValidityPeriod = ptr.To[metav1.Duration](metav1.Duration{Duration: time.Duration(c.Int31n(100*365)+1) * time.Hour * 24})
 
