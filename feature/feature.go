@@ -101,7 +101,7 @@ var defaultClusterAPIFeatureGates = map[featuregate.Feature]featuregate.FeatureS
 	// Every feature should be initiated here:
 	MachineWaitForVolumeDetachConsiderVolumeAttachments: {Default: true, PreRelease: featuregate.GA},
 	MachinePool:                    {Default: true, PreRelease: featuregate.Beta},
-	MachineSetPreflightChecks:      {Default: true, PreRelease: featuregate.Beta},
+	MachineSetPreflightChecks:      {Default: false, PreRelease: featuregate.Beta},
 	PriorityQueue:                  {Default: true, PreRelease: featuregate.Beta},
 	ReconcilerRateLimiting:         {Default: true, PreRelease: featuregate.Beta},
 	ClusterTopology:                {Default: false, PreRelease: featuregate.Alpha},
