@@ -459,3 +459,61 @@ func Convert_v1beta2_BottlerocketControl_To_upstreamv1beta3_BottlerocketControl(
 func Convert_v1beta2_ClusterConfiguration_To_upstreamv1beta3_ClusterConfiguration(in *bootstrapv1.ClusterConfiguration, out *ClusterConfiguration, s apimachineryconversion.Scope) error {
 	return autoConvert_v1beta2_ClusterConfiguration_To_upstreamv1beta3_ClusterConfiguration(in, out, s)
 }
+
+func Convert_upstreamv1beta3_BottlerocketAdmin_To_v1beta2_BottlerocketAdmin(in *BottlerocketAdmin, out *bootstrapv1.BottlerocketAdmin, _ apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
+func Convert_v1beta2_BottlerocketAdmin_To_upstreamv1beta3_BottlerocketAdmin(in *bootstrapv1.BottlerocketAdmin, out *BottlerocketAdmin, _ apimachineryconversion.Scope) error {
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	return nil
+}
+
+func Convert_upstreamv1beta3_BottlerocketHostContainer_To_v1beta2_BottlerocketHostContainer(in *BottlerocketHostContainer, out *bootstrapv1.BottlerocketHostContainer, _ apimachineryconversion.Scope) error {
+	out.Name = in.Name
+	out.Superpowered = in.Superpowered
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	out.UserData = in.UserData
+	return nil
+}
+
+func Convert_v1beta2_BottlerocketHostContainer_To_upstreamv1beta3_BottlerocketHostContainer(in *bootstrapv1.BottlerocketHostContainer, out *BottlerocketHostContainer, _ apimachineryconversion.Scope) error {
+	out.Name = in.Name
+	out.Superpowered = in.Superpowered
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	out.UserData = in.UserData
+	return nil
+}
+
+func Convert_upstreamv1beta3_BottlerocketBootstrapContainer_To_v1beta2_BottlerocketBootstrapContainer(in *BottlerocketBootstrapContainer, out *bootstrapv1.BottlerocketBootstrapContainer, _ apimachineryconversion.Scope) error {
+	out.Name = in.Name
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	out.Essential = in.Essential
+	out.Mode = in.Mode
+	out.UserData = in.UserData
+	return nil
+}
+
+func Convert_v1beta2_BottlerocketBootstrapContainer_To_upstreamv1beta3_BottlerocketBootstrapContainer(in *bootstrapv1.BottlerocketBootstrapContainer, out *BottlerocketBootstrapContainer, _ apimachineryconversion.Scope) error {
+	out.Name = in.Name
+	out.ImageRepository = in.ImageRepository
+	out.ImageTag = in.ImageTag
+	out.Essential = in.Essential
+	out.Mode = in.Mode
+	out.UserData = in.UserData
+	return nil
+}
+
+func Convert_v1beta2_BottlerocketKubernetesSettings_To_upstreamv1beta3_BottlerocketKubernetesSettings(in *bootstrapv1.BottlerocketKubernetesSettings, out *BottlerocketKubernetesSettings, _ apimachineryconversion.Scope) error {
+	out.MaxPods = in.MaxPods
+	out.AllowedUnsafeSysctls = in.AllowedUnsafeSysctls
+	out.ClusterDNSIPs = in.ClusterDNSIPs
+	// Note: Other fields in v1beta2.BottlerocketKubernetesSettings don't exist in upstreamv1beta3 version
+	return nil
+}

@@ -119,7 +119,7 @@ type ClusterConfiguration struct {
 	// Proxy holds the https and no proxy information
 	// This is only for bottlerocket
 	// +optional
-	Proxy ProxyConfiguration `json:"proxy,omitempty"`
+	Proxy Proxy `json:"proxy,omitempty"`
 
 	// RegistryMirror holds the image registry mirror information
 	// This is only for bottlerocket
