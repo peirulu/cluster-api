@@ -546,7 +546,7 @@ func (r *KubeadmControlPlaneReconciler) reconcile(ctx context.Context, controlPl
 				*/
 				if controlPlane.Cluster.Spec.ManagedExternalEtcdRef.IsDefined() {
 					etcdRef := controlPlane.Cluster.Spec.ManagedExternalEtcdRef
-					externalEtcd, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, etcdRef, controlPlane.Cluster.Namespace)
+					externalEtcd, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, *etcdRef, controlPlane.Cluster.Namespace)
 					if err != nil {
 						return ctrl.Result{}, err
 					}
@@ -1757,7 +1757,7 @@ func (r *KubeadmControlPlaneReconciler) updateManagedExternalEtcdEndpoints(
 	}
 
 	etcdRef := cluster.Spec.ManagedExternalEtcdRef
-	externalEtcd, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, etcdRef, cluster.Namespace)
+	externalEtcd, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, *etcdRef, cluster.Namespace)
 	if err != nil {
 		return ctrl.Result{}, err
 	}

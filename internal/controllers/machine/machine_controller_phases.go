@@ -352,7 +352,7 @@ func (r *Reconciler) reconcileInfrastructure(ctx context.Context, s *scope) (ctr
 		// set first node's IP address on EtcdCluster
 		// get etcd cluster
 		ref := cluster.Spec.ManagedExternalEtcdRef
-		obj, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, ref, cluster.Namespace)
+		obj, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, *ref, cluster.Namespace)
 		if err != nil {
 			if apierrors.IsNotFound(errors.Cause(err)) {
 				return ctrl.Result{}, err

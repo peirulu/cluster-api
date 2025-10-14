@@ -1035,7 +1035,7 @@ func TestFilterOwnedDescendants(t *testing.T) {
 			Name: "c",
 		},
 		Spec: clusterv1.ClusterSpec{
-			ManagedExternalEtcdRef: clusterv1.ContractVersionedObjectReference{},
+			ManagedExternalEtcdRef: &clusterv1.ContractVersionedObjectReference{},
 		},
 	}
 

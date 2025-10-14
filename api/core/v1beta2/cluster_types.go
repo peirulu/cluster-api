@@ -499,7 +499,7 @@ type ClusterSpec struct {
 	// ManagedExternalEtcdRef is an optional reference to an etcd provider resource that holds details
 	// for provisioning an external etcd cluster
 	// +optional
-	ManagedExternalEtcdRef ContractVersionedObjectReference `json:"managedExternalEtcdRef,omitempty"`
+	ManagedExternalEtcdRef *ContractVersionedObjectReference `json:"managedExternalEtcdRef,omitempty"`
 
 	// infrastructureRef is a reference to a provider-specific resource that holds the details
 	// for provisioning infrastructure for a cluster in said provider.

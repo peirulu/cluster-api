@@ -1595,7 +1595,15 @@ func autoConvert_v1beta1_ClusterSpec_To_v1beta2_ClusterSpec(in *ClusterSpec, out
 		return err
 	}
 	// WARNING: in.ControlPlaneRef requires manual conversion: inconvertible types (*k8s.io/api/core/v1.ObjectReference vs sigs.k8s.io/cluster-api/api/core/v1beta2.ContractVersionedObjectReference)
-	// WARNING: in.ManagedExternalEtcdRef requires manual conversion: inconvertible types (*k8s.io/api/core/v1.ObjectReference vs sigs.k8s.io/cluster-api/api/core/v1beta2.ContractVersionedObjectReference)
+	if in.ManagedExternalEtcdRef != nil {
+		in, out := &in.ManagedExternalEtcdRef, &out.ManagedExternalEtcdRef
+		*out = new(v1beta2.ContractVersionedObjectReference)
+		if err := Convert_v1_ObjectReference_To_v1beta2_ContractVersionedObjectReference(*in, *out, s); err != nil {
+			return err
+		}
+	} else {
+		out.ManagedExternalEtcdRef = nil
+	}
 	// WARNING: in.InfrastructureRef requires manual conversion: inconvertible types (*k8s.io/api/core/v1.ObjectReference vs sigs.k8s.io/cluster-api/api/core/v1beta2.ContractVersionedObjectReference)
 	// WARNING: in.Topology requires manual conversion: inconvertible types (*sigs.k8s.io/cluster-api/api/core/v1beta1.Topology vs sigs.k8s.io/cluster-api/api/core/v1beta2.Topology)
 	out.AvailabilityGates = *(*[]v1beta2.ClusterAvailabilityGate)(unsafe.Pointer(&in.AvailabilityGates))
@@ -1611,7 +1619,15 @@ func autoConvert_v1beta2_ClusterSpec_To_v1beta1_ClusterSpec(in *v1beta2.ClusterS
 		return err
 	}
 	// WARNING: in.ControlPlaneRef requires manual conversion: inconvertible types (sigs.k8s.io/cluster-api/api/core/v1beta2.ContractVersionedObjectReference vs *k8s.io/api/core/v1.ObjectReference)
-	// WARNING: in.ManagedExternalEtcdRef requires manual conversion: inconvertible types (sigs.k8s.io/cluster-api/api/core/v1beta2.ContractVersionedObjectReference vs *k8s.io/api/core/v1.ObjectReference)
+	if in.ManagedExternalEtcdRef != nil {
+		in, out := &in.ManagedExternalEtcdRef, &out.ManagedExternalEtcdRef
+		*out = new(corev1.ObjectReference)
+		if err := Convert_v1beta2_ContractVersionedObjectReference_To_v1_ObjectReference(*in, *out, s); err != nil {
+			return err
+		}
+	} else {
+		out.ManagedExternalEtcdRef = nil
+	}
 	// WARNING: in.InfrastructureRef requires manual conversion: inconvertible types (sigs.k8s.io/cluster-api/api/core/v1beta2.ContractVersionedObjectReference vs *k8s.io/api/core/v1.ObjectReference)
 	// WARNING: in.Topology requires manual conversion: inconvertible types (sigs.k8s.io/cluster-api/api/core/v1beta2.Topology vs *sigs.k8s.io/cluster-api/api/core/v1beta1.Topology)
 	out.AvailabilityGates = *(*[]ClusterAvailabilityGate)(unsafe.Pointer(&in.AvailabilityGates))

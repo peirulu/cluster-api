@@ -67,6 +67,14 @@ func (src *Cluster) ConvertTo(dstRaw conversion.Hub) error {
 		dst.Spec.ControlPlaneRef = controlPlaneRef
 	}
 
+	if src.Spec.ManagedExternalEtcdRef != nil {
+		etcdRef, err := convertToContractVersionedObjectReference(src.Spec.ManagedExternalEtcdRef)
+		if err != nil {
+			return err
+		}
+		dst.Spec.ManagedExternalEtcdRef = &etcdRef
+	}
+
 	restored := &clusterv1.Cluster{}
 	ok, err := utilconversion.UnmarshalData(src, restored)
 	if err != nil {
@@ -107,6 +115,14 @@ func (dst *Cluster) ConvertFrom(srcRaw conversion.Hub) error {
 			return err
 		}
 		dst.Spec.ControlPlaneRef = controlPlaneRef
+	}
+
+	if src.Spec.ManagedExternalEtcdRef != nil && src.Spec.ManagedExternalEtcdRef.IsDefined() {
+		etcdRef, err := convertToObjectReference(*src.Spec.ManagedExternalEtcdRef, src.Namespace)
+		if err != nil {
+			return err
+		}
+		dst.Spec.ManagedExternalEtcdRef = etcdRef
 	}
 
 	if dst.Spec.ClusterNetwork != nil && dst.Spec.ClusterNetwork.APIServerPort != nil &&

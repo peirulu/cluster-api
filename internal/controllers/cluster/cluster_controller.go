@@ -452,7 +452,7 @@ func (r *Reconciler) reconcileDelete(ctx context.Context, s *scope) (reconcile.R
 	}
 
 	if cluster.Spec.ManagedExternalEtcdRef.IsDefined() {
-		obj, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, cluster.Spec.ManagedExternalEtcdRef, cluster.Namespace)
+		obj, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, *cluster.Spec.ManagedExternalEtcdRef, cluster.Namespace)
 		switch {
 		case apierrors.IsNotFound(errors.Cause(err)):
 			// Etcd cluster has been deleted
@@ -483,7 +483,7 @@ func (r *Reconciler) reconcileDelete(ctx context.Context, s *scope) (reconcile.R
 	}
 
 	if cluster.Spec.ManagedExternalEtcdRef.IsDefined() {
-		obj, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, cluster.Spec.ManagedExternalEtcdRef, cluster.Namespace)
+		obj, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, *cluster.Spec.ManagedExternalEtcdRef, cluster.Namespace)
 		switch {
 		case apierrors.IsNotFound(errors.Cause(err)):
 			// Etcd cluster has been deleted

@@ -383,7 +383,7 @@ func (r *Reconciler) handlePauseControlPlaneWithExternalManagedEtcd(ctx context.
 	}
 
 	etcdRef := cluster.Spec.ManagedExternalEtcdRef
-	externalEtcd, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, etcdRef, cluster.Namespace)
+	externalEtcd, err := external.GetObjectFromContractVersionedRef(ctx, r.Client, *etcdRef, cluster.Namespace)
 	if err != nil {
 		if apierrors.IsNotFound(errors.Cause(err)) {
 			log.Info("Could not find external object for cluster, requeuing", "refGroupVersionKind", etcdRef.GroupKind(), "refName", etcdRef.Name)
@@ -420,7 +420,7 @@ func (r *Reconciler) reconcileEtcdCluster(ctx context.Context, s *scope) (ctrl.R
 		return ctrl.Result{}, nil
 	}
 	// Call generic external reconciler.
-	obj, err := r.reconcileExternal(ctx, cluster, cluster.Spec.ManagedExternalEtcdRef)
+	obj, err := r.reconcileExternal(ctx, cluster, *cluster.Spec.ManagedExternalEtcdRef)
 	etcdPlaneReconcileResult := external.ReconcileOutput{Result: obj}
 	if err != nil {
 		return ctrl.Result{}, err

@@ -1259,7 +1259,6 @@ func schema_cluster_api_api_core_v1beta2_ClusterSpec(ref common.ReferenceCallbac
 					"managedExternalEtcdRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "ManagedExternalEtcdRef is an optional reference to an etcd provider resource that holds details for provisioning an external etcd cluster",
-							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/cluster-api/api/core/v1beta2.ContractVersionedObjectReference"),
 						},
 					},

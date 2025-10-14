@@ -4503,7 +4503,7 @@ func TestKubeadmControlPlaneReconciler_updateManagedExternalEtcdEndpoints(t *tes
 		unstructured.SetNestedField(managedEtcd.Object, true, "status", "ready")
 		unstructured.SetNestedField(managedEtcd.Object, strings.Join(endpoints, ","), "status", "endpoints")
 		cluster, kcp, _ := createClusterWithControlPlane(ns)
-		cluster.Spec.ManagedExternalEtcdRef = clusterv1.ContractVersionedObjectReference{
+		cluster.Spec.ManagedExternalEtcdRef = &clusterv1.ContractVersionedObjectReference{
 			APIGroup: managedEtcd.GroupVersionKind().Group,
 			Kind:     managedEtcd.GetKind(),
 			Name:     managedEtcd.GetName(),
