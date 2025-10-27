@@ -480,7 +480,6 @@ type RegistryMirrorConfiguration struct {
 	CACert string `json:"caCert,omitempty"`
 
 	// Mirrors defines a list of image registry mirrors.
-	// +k8s:conversion-gen=false
 	// +optional
 	Mirrors []Mirror `json:"mirrors,omitempty"`
 }

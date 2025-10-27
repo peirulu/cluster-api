@@ -1307,7 +1307,7 @@ func Convert_v1beta2_ProxyConfiguration_To_upstreamv1beta3_ProxyConfiguration(in
 func autoConvert_upstreamv1beta3_RegistryMirrorConfiguration_To_v1beta2_RegistryMirrorConfiguration(in *RegistryMirrorConfiguration, out *v1beta2.RegistryMirrorConfiguration, s conversion.Scope) error {
 	out.Endpoint = in.Endpoint
 	out.CACert = in.CACert
-	// INFO: in.Mirrors opted out of conversion generation
+	out.Mirrors = *(*[]v1beta2.Mirror)(unsafe.Pointer(&in.Mirrors))
 	return nil
 }
 
@@ -1319,7 +1319,7 @@ func Convert_upstreamv1beta3_RegistryMirrorConfiguration_To_v1beta2_RegistryMirr
 func autoConvert_v1beta2_RegistryMirrorConfiguration_To_upstreamv1beta3_RegistryMirrorConfiguration(in *v1beta2.RegistryMirrorConfiguration, out *RegistryMirrorConfiguration, s conversion.Scope) error {
 	out.Endpoint = in.Endpoint
 	out.CACert = in.CACert
-	// INFO: in.Mirrors opted out of conversion generation
+	out.Mirrors = *(*[]Mirror)(unsafe.Pointer(&in.Mirrors))
 	return nil
 }
 
