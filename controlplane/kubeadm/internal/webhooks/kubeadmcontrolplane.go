@@ -72,8 +72,12 @@ func (webhook *KubeadmControlPlane) Default(_ context.Context, k *controlplanev1
 	}
 
 	// Enforce RollingUpdate strategy and default MaxSurge if not set.
-	k.Spec.Rollout.Strategy.Type = controlplanev1.RollingUpdateStrategyType
-	k.Spec.Rollout.Strategy.RollingUpdate.MaxSurge = intstr.ValueOrDefault(k.Spec.Rollout.Strategy.RollingUpdate.MaxSurge, intstr.FromInt32(1))
+	if k.Spec.Rollout.Strategy.Type == "" {
+		k.Spec.Rollout.Strategy.Type = controlplanev1.RollingUpdateStrategyType
+	}
+	if k.Spec.Rollout.Strategy.Type == controlplanev1.RollingUpdateStrategyType {
+		k.Spec.Rollout.Strategy.RollingUpdate.MaxSurge = intstr.ValueOrDefault(k.Spec.Rollout.Strategy.RollingUpdate.MaxSurge, intstr.FromInt32(1))
+	}
 	return nil
 }
 
